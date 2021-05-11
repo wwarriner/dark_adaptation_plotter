@@ -1,15 +1,7 @@
 %% DATA CLASS
 DATA_FILE = "D:/repos/dark_adaptation_plotter/test_data.csv";
-dd.load(DATA_FILE);
-
-ids = dd.ids;
-ppt_id = randsample(ids, 1);
-
-%% DATA INTERFACE
-dp = dd.get(ppt_id);
-
-rit = dp.recovery_time;
-d = dp.data;
+data = dapData();
+data.load(DATA_FILE);
 
 %% PLOT
 % FIGURE
@@ -20,6 +12,7 @@ fh.Color = [1.0 1.0 1.0]; % MAKE CLASS
 axh = axes(fh);
 hold(axh, "on");
 axh.TickDir = "out";
+
 
 % X AXIS
 X_LABEL_DEFAULT = "Minutes following photobleach"; % CONFIG
@@ -68,30 +61,27 @@ ph.LineStyle = ":";
 ph.LineWidth = 2.0;
 ph.Color = [0.0 0.0 0.0];
 
-% DATA PLOT
-MARKER = "d"; % CONFIG, WILL NEED A TABLE OF DEFAULTS AND TABLE OF USER SELECTED VALUES
-MARKER_SIZE = 8; % CONFIG
-COLOR = [1.0 0.0 0.0]; % CONFIG (use uisetcolor())
+%% DATA PLOT
 
-marker = MARKER; % USER SELECTED
-marker_size = MARKER_SIZE; % USER SELECTED?
-color = COLOR; % USER SELECTED
+COUNT = 3;
 
-ph = plot(axh, d(:, 1), d(:, 2)); % CAN BE UPDATED
-ph.MarkerSize = marker_size;
-ph.Marker = marker;
-ph.MarkerFaceColor = color;
-ph.MarkerEdgeColor = color;
-ph.Color = "none";
+ids = data.ids;
+ppt_id = randsample(ids, COUNT);
+markers = ["d" "s" "o"];
+colors = {Color.RED(); Color.GREEN(); Color.BLUE()};
 
-% RIT PLOT
-start = [rit recovery_log_sensitivity];
-stop = [rit y_max];
-[ph, lh] = draw_arrow(axh, start, stop);
-ph.FaceColor = color;
-ph.EdgeColor = color;
-lh.Color = color;
-lh.LineWidth = 2;
-% ah = arrow(axh, start, stop);
-% arrow([], 'fixlimits');
-%ah.Parent = axh;
+for i = 1 : COUNT
+    patient = data.get(ppt_id(i));
+    
+    MARKER = markers{i}; % CONFIG, WILL NEED A TABLE OF DEFAULTS AND TABLE OF USER SELECTED VALUES
+    MARKER_SIZE = 8; % CONFIG
+    COLOR = colors{i}; % CONFIG (use uisetcolor())
+    ARROW_LINE_WIDTH = 2; % CONFIG
+
+    dplot = dapPlot(patient);
+    dplot.marker = MARKER;
+    dplot.marker_size = MARKER_SIZE;
+    dplot.color = COLOR;
+    dplot.arrow_line_width = ARROW_LINE_WIDTH;
+    dplot.draw(axh); 
+end

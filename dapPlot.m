@@ -19,6 +19,8 @@ classdef dapPlot < handle
         end
         
         function draw(obj, axh)
+            assert(isa(axh, "matlab.graphics.axis.Axes"));
+            
             ph = plot(axh, obj.patient.time, obj.patient.sensitivity);
             obj.data_plot_handle = ph;
             

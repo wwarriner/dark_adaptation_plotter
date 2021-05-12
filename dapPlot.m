@@ -5,6 +5,8 @@ classdef dapPlot < handle
         color Color = Color.BLUE()
         
         arrow_line_width (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 2
+        
+        visible (1,1) logical = false;
     end
     
     methods
@@ -34,6 +36,7 @@ classdef dapPlot < handle
         end
         
         function update_data(obj)
+            obj.data_plot_handle.Visible = obj.visible;
             obj.data_plot_handle.MarkerSize = obj.marker_size;
             obj.data_plot_handle.Marker = obj.marker;
             obj.data_plot_handle.MarkerFaceColor = obj.color.rgb;
@@ -42,6 +45,7 @@ classdef dapPlot < handle
         end
         
         function update_arrow(obj)
+            obj.arrow.visible = obj.visible;
             obj.arrow.color = obj.color;
             obj.arrow.line_width = obj.arrow_line_width;
             obj.arrow.update();

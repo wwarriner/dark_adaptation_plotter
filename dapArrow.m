@@ -6,6 +6,8 @@ classdef dapArrow < handle
         color Color = Color.BLUE()
         line_width (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 2
         head_size_pt (1,2) double {mustBeReal,mustBeFinite,mustBePositive} = [24 24]
+        
+        visible (1,1) logical = false;
     end
     
     methods
@@ -47,12 +49,14 @@ classdef dapArrow < handle
             h.EdgeColor = obj.color.rgb;
             h.XData = x_tri;
             h.YData = y_tri;
+            h.Visible = obj.visible;
             
             h = obj.line_handle;
             h.XData = x_line;
             h.YData = y_line;
             h.Color = obj.color.rgb;
             h.LineWidth = obj.line_width;
+            h.Visible = obj.visible;
         end
     end
     

@@ -1,12 +1,11 @@
 classdef dapArrow < handle
     properties
-        start (1,2) double
-        stop (1,2) double
-        
-        color Color = Color.BLUE()
         line_width (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 2
         head_size_pt (1,2) double {mustBeReal,mustBeFinite,mustBePositive} = [24 24]
         
+        start (1,2) double
+        stop (1,2) double
+        color Color = Color.BLUE()
         visible (1,1) logical = false;
     end
     
@@ -36,6 +35,10 @@ classdef dapArrow < handle
         end
         
         function update(obj)
+            assert(~isempty(obj.head_handle));
+            assert(~isempty(obj.line_handle));
+            assert(~isempty(obj.axes_handle));
+            
             obj.stop(2) = obj.axes_handle.YLim(2);
             
             scale = obj.get_scale(obj.axes_handle);
@@ -61,8 +64,8 @@ classdef dapArrow < handle
     end
     
     properties (Access = private)
-        head_handle matlab.graphics.Graphics
-        line_handle matlab.graphics.Graphics
+        head_handle matlab.graphics.primitive.Patch
+        line_handle matlab.graphics.primitive.Line
         axes_handle matlab.graphics.axis.Axes
     end
     

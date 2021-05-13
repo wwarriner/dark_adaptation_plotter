@@ -54,8 +54,7 @@ classdef dapPlots < handle
             obj.data{row, "Visible"} = visible;
             plot = obj.plots(id);
             plot.visible = visible;
-            plot.update_data();
-            plot.update_arrow();
+            plot.update();
         end
         
         function update_color(obj, id, color)
@@ -65,8 +64,7 @@ classdef dapPlots < handle
             obj.data{row, "Color"} = color;
             plot = obj.plots(id);
             plot.color = color;
-            plot.update_data();
-            plot.update_arrow();
+            plot.update();
         end
         
         function update_marker(obj, id, marker)
@@ -78,7 +76,7 @@ classdef dapPlots < handle
             obj.data{row, "Marker"} = marker;
             plot = obj.plots(id);
             plot.marker = marker;
-            plot.update_data();
+            plot.update();
         end
     end
     

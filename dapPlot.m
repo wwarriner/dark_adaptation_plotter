@@ -14,6 +14,11 @@ classdef dapPlot < handle
             obj.patient = patient;
         end
         
+        function delete(obj)
+            delete(obj.scatter);
+            delete(obj.arrow);
+        end
+        
         function draw(obj, axh)
             assert(isa(axh, "matlab.graphics.axis.Axes"));
             

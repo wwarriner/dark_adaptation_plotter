@@ -13,6 +13,10 @@ classdef dapScatter < handle
             obj.y = y;
         end
         
+        function delete(obj)
+            delete(obj.plot_handle);
+        end
+        
         function draw(obj, axh)
             assert(isa(axh, "matlab.graphics.axis.Axes"));
             

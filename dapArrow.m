@@ -15,6 +15,11 @@ classdef dapArrow < handle
             obj.stop = stop;
         end
         
+        function delete(obj)
+            delete(obj.head_handle);
+            delete(obj.line_handle);
+        end
+        
         function draw(obj, axh)
             assert(isa(axh, "matlab.graphics.axis.Axes"));
             

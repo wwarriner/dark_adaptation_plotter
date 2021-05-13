@@ -11,12 +11,20 @@ classdef dapAxes < handle
         y_step (1,1) double {mustBeReal,mustBeFinite} = 0.5
         y_minor_step (1,1) double {mustBeReal,mustBeFinite} = 0.1
         y_max (1,1) double {mustBeReal,mustBeFinite} = 4.5
+        
+        position (1,4) double
     end
     
     methods
         function obj = dapAxes(fh)
             axh = axes(fh);
             hold(axh, "on");
+            axh.Units = "pixels";
+            axh.Box = "on";
+            axh.PositionConstraint = "outerposition";
+            axh.PlotBoxAspectRatio = [1 1 1];
+            axh.Interactions = [];
+            axh.Toolbar = [];
             
             obj.figure_handle = fh;
             obj.axes_handle = axh;
@@ -45,6 +53,18 @@ classdef dapAxes < handle
             h.YAxis.MinorTick = "on";
             h.YAxis.MinorTickValues = y_min_curr : obj.y_minor_step : y_max_curr;
             h.YAxis.Direction = "reverse";
+        end
+        
+        function update_position(obj)
+            h = obj.axes_handle;
+            h.OuterPosition = obj.position;
+%             drawnow;
+%             inset = h.TightInset;
+%             op = h.OuterPosition;
+%             h.Position = [inset(1:2), op(3) - inset(1) - inset(3), op(4) - inset(2) - inset(4)];
+%             drawnow;
+%             h.Position = [inset(1:2), op(3) - inset(1) - inset(3), op(4) - inset(2) - inset(4)];
+%             drawnow;
         end
         
         function draw_on(obj, draw_fn)

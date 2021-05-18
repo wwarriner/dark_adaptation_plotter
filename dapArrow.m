@@ -30,7 +30,9 @@ classdef dapArrow < handle
             [x_tri, y_tri] = obj.compute_triangle(r, scale, extent);
             
             lh = line(axh, x_line, y_line);
+            lh.Annotation.LegendInformation.IconDisplayStyle = "off";
             ph = patch(axh, "xdata", x_tri, "ydata", y_tri);
+            ph.Annotation.LegendInformation.IconDisplayStyle = "off";
             
             obj.line_handle = lh;
             obj.head_handle = ph;

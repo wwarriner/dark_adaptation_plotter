@@ -5,6 +5,7 @@ classdef dapScatter < handle
         
         color Color = Color.BLUE()
         visible (1,1) logical = false
+        display_name (1,1) string = ""
     end
     
     methods
@@ -21,6 +22,7 @@ classdef dapScatter < handle
             assert(isa(axh, "matlab.graphics.axis.Axes"));
             
             ph = plot(axh, obj.x, obj.y);
+            ph.Annotation.LegendInformation.IconDisplayStyle = "off";
             obj.plot_handle = ph;
             
             obj.update();
@@ -36,6 +38,13 @@ classdef dapScatter < handle
             h.MarkerEdgeColor = obj.color.rgb;
             h.Color = "none";
             h.Visible = obj.visible;
+            if obj.visible
+                display = "on";
+            else
+                display = "off";
+            end
+            h.Annotation.LegendInformation.IconDisplayStyle = display;
+            h.DisplayName = obj.display_name;
         end
     end
     

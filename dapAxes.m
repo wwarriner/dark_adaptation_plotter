@@ -13,6 +13,11 @@ classdef dapAxes < handle
         y_max (1,1) double {mustBeReal,mustBeFinite} = 4.5
         
         position (1,4) double
+        
+        FontName (1,1) string
+        FontSize (1,1) double
+        FontWeight (1,1) string
+        FontAngle (1,1) string
     end
     
     methods
@@ -72,6 +77,14 @@ classdef dapAxes < handle
             draw_fn - a function handle which accepts an axes object
             %}
             [varargout{1:nargout}] = draw_fn(obj.axes_handle);
+        end
+        
+        function update_font(obj)
+            h = obj.axes_handle;
+            h.FontName = obj.FontName;
+            h.FontSize = obj.FontSize;
+            h.FontWeight = obj.FontWeight;
+            h.FontAngle = obj.FontAngle;
         end
     end
     

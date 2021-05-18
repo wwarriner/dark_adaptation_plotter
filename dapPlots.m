@@ -7,12 +7,8 @@ classdef dapPlots < handle
         function obj = dapPlots(dap_axes)
             plots = containers.Map("keytype", "char", "valuetype", "any");
             
-            legend_handle = dap_axes.draw_on(@legend);
-            legend_handle.Location = "eastoutside";
-            
             obj.dap_axes = dap_axes;
             obj.plots = plots;
-            obj.legend_handle = legend_handle;
         end
         
         function value = has(obj, id)
@@ -91,7 +87,6 @@ classdef dapPlots < handle
     properties (Access = private)
         dap_axes dapAxes
         plots containers.Map
-        legend_handle matlab.graphics.illustration.Legend
     end
 end
 

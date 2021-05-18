@@ -11,6 +11,7 @@ classdef dapRecoveryLine < handle
             assert(isa(axh, "matlab.graphics.axis.Axes"));
             
             ph = hline(axh, obj.y);
+            ph.Annotation.LegendInformation.IconDisplayStyle = "off";
             obj.line_handle = ph;
             
             obj.axes_handle = axh;

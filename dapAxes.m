@@ -67,11 +67,11 @@ classdef dapAxes < handle
 %             drawnow;
         end
         
-        function draw_on(obj, draw_fn)
+        function varargout = draw_on(obj, draw_fn)
             %{
             draw_fn - a function handle which accepts an axes object
             %}
-            draw_fn(obj.axes_handle);
+            [varargout{1:nargout}] = draw_fn(obj.axes_handle);
         end
     end
     

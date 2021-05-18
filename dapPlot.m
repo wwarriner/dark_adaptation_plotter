@@ -3,6 +3,7 @@ classdef dapPlot < handle
         marker (1,1) string = "d"
         color Color = Color.BLUE()
         visible (1,1) logical = false
+        display_name (1,1) string = ""
     end
     
     methods
@@ -42,6 +43,7 @@ classdef dapPlot < handle
             obj.scatter.marker = obj.marker;
             obj.scatter.color = obj.color;
             obj.scatter.visible = obj.visible;
+            obj.scatter.display_name = obj.display_name;
             
             obj.arrow.color = obj.color;
             obj.arrow.visible = obj.visible;

@@ -4,10 +4,18 @@ classdef dapData < handle
     end
     
     methods
-        function load(obj, file_path)
+        function obj = dapData()
+            obj.clear();
+        end
+        
+        function clear(obj)
             obj.patients = containers.Map("keytype", "char", "valuetype", "any");
-            obj.order = containers.Map("keytype", "double", "valuetype", "char");
-            
+        end
+        
+        function load(obj, file_path)
+            %{
+            Overwrites data for existing IDs.
+            %}
             t = readtable(file_path);
             % TODO mangle t.Properties.VariableNames
             % TODO check mangled t.Properties.VariableNames against canonical
@@ -16,13 +24,10 @@ classdef dapData < handle
             t.PPT_ID = string(t.PPT_ID);
             
             pt_ids = unique(t.PPT_ID);
-            pt_ids = natsort(pt_ids); % https://www.mathworks.com/matlabcentral/fileexchange/47434-natural-order-filename-sort
-            start_order = numel(obj.ids);
+            %pt_ids = natsort(pt_ids); % https://www.mathworks.com/matlabcentral/fileexchange/47434-natural-order-filename-sort
             for i = 1 : numel(pt_ids)
                 id = pt_ids(i);
-                
                 subset = t(t.PPT_ID == id, :);
-                
                 recovery_time = unique(subset.RIT);
                 % TODO handle non-uniform RIT
                 
@@ -33,32 +38,45 @@ classdef dapData < handle
                     subset.threshold_value1 ...
                     );
                 obj.patients(char(id)) = dp;
-                obj.order(start_order + i) = char(id);
             end
         end
         
-        function dp = get(obj, id)
-            dp = obj.patients(char(id));
+        function value = has(obj, id)
+            value = obj.patients.isKey(char(id));
+        end
+        
+        function value = get(obj, id)
+            assert(obj.has(id));
+            
+            value = obj.patients(char(id));
+        end
+        
+        function [patients, ids] = get_all_except(obj, ids)
+            all_ids = string(obj.patients.keys());
+            all_except_ids = setdiff(all_ids, ids);
+            count = numel(all_except_ids);
+            patients = cell(count, 1);
+            for i = 1 : count
+                patients{i} = obj.get(all_except_ids(i));
+            end
+            ids = all_except_ids;
+        end
+        
+        function remove(obj, id)
+            assert(obj.has(id));
+            
+            obj.patients.remove(char(id));
         end
     end
 
     methods % properties
         function ids = get.ids(obj)
-            ids = string(obj.order.values());
+            ids = string(obj.patients.keys());
         end
     end
     
     properties (Access = private)
         patients containers.Map
-        order containers.Map
-    end
-    
-    properties (Access = private, Constant)
-        
-    end
-    
-    methods (Access = private)
-        
     end
 end
 

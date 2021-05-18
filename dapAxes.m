@@ -21,12 +21,12 @@ classdef dapAxes < handle
     end
     
     methods
-        function obj = dapAxes(fh)
-            axh = axes(fh);
+        function obj = dapAxes(fh, layout)
+            axh = nexttile(layout, 1, [1 2]);
             hold(axh, "on");
             axh.Units = "pixels";
             axh.Box = "on";
-            axh.PositionConstraint = "outerposition";
+            %axh.PositionConstraint = "outerposition";
             axh.PlotBoxAspectRatio = [1 1 1];
             axh.Interactions = [];
             axh.Toolbar = [];

@@ -12,8 +12,6 @@ classdef dapAxes < handle
         y_minor_step (1,1) double {mustBeReal,mustBeFinite} = 0.1
         y_max (1,1) double {mustBeReal,mustBeFinite} = 4.5
         
-        position (1,4) double
-        
         FontName (1,1) string
         FontSize (1,1) double
         FontWeight (1,1) string
@@ -30,7 +28,6 @@ classdef dapAxes < handle
             obj.layout_handle = layout_handle;
             obj.axes_handle = axes_handle;
             obj.legend_handle = legend_handle;
-            obj.position = obj.axes_handle.Position;
             
             obj.update();
         end
@@ -44,6 +41,9 @@ classdef dapAxes < handle
             
             h = obj.axes_handle;
             
+            h.TickDir = "out";
+            h.TickLength = [0.025 0.05];
+            
             h.XLabel.String = obj.x_label;
             h.XLim = [x_min_curr x_max_curr];
             h.XTick = x_min_curr : obj.x_step : x_max_curr;
@@ -56,18 +56,6 @@ classdef dapAxes < handle
             h.YAxis.MinorTick = "on";
             h.YAxis.MinorTickValues = y_min_curr : obj.y_minor_step : y_max_curr;
             h.YAxis.Direction = "reverse";
-        end
-        
-        function update_position(obj)
-            h = obj.axes_handle;
-            h.OuterPosition = obj.position;
-%             drawnow;
-%             inset = h.TightInset;
-%             op = h.OuterPosition;
-%             h.Position = [inset(1:2), op(3) - inset(1) - inset(3), op(4) - inset(2) - inset(4)];
-%             drawnow;
-%             h.Position = [inset(1:2), op(3) - inset(1) - inset(3), op(4) - inset(2) - inset(4)];
-%             drawnow;
         end
         
         function varargout = draw_on(obj, draw_fn)

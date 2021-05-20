@@ -1,7 +1,7 @@
 classdef dapOutputFiles < handle
     properties
         desired_size (1,1) double = 800
-        folder (1,1)
+        folder (1,1) string
         file_name (1,1) string = "out.png"
     end
     
@@ -18,8 +18,10 @@ classdef dapOutputFiles < handle
         end
         
         function ui_run_export_as(obj)
+            filter = ["*.png"; "*.eps"; "*.pdf"];
+            title = "Export figure as";
             default_file_path = fullfile(obj.folder, obj.file_name);
-            [file, path] = uiputfile(["*.png"; "*.eps"; "*.pdf"], "Export figure as", default_file_path);
+            [file, path] = uiputfile(filter, title, default_file_path);
             if file == 0
                 return;
             end

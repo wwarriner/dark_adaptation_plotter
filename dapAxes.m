@@ -21,18 +21,16 @@ classdef dapAxes < handle
     end
     
     methods
-        function obj = dapAxes(fh, layout)
-            axh = nexttile(layout, 1, [1 2]);
-            hold(axh, "on");
-            axh.Units = "pixels";
-            axh.Box = "on";
-            %axh.PositionConstraint = "outerposition";
-            axh.PlotBoxAspectRatio = [1 1 1];
-            axh.Interactions = [];
-            axh.Toolbar = [];
+        function obj = dapAxes(container_handle)
+            layout_handle = obj.build_layout(container_handle);
+            axes_handle = obj.build_axes(layout_handle);
+            legend_handle = obj.build_legend(axes_handle);
             
-            obj.figure_handle = fh;
-            obj.axes_handle = axh;
+            obj.container_handle = container_handle;
+            obj.layout_handle = layout_handle;
+            obj.axes_handle = axes_handle;
+            obj.legend_handle = legend_handle;
+            obj.position = obj.axes_handle.Position;
             
             obj.update();
         end
@@ -79,6 +77,13 @@ classdef dapAxes < handle
             [varargout{1:nargout}] = draw_fn(obj.axes_handle);
         end
         
+        function [new_axes, new_legend] = copyobj(obj, parent_handle)
+            h = [obj.axes_handle, obj.legend_handle];
+            h = copyobj(h, parent_handle);
+            new_axes = h(1);
+            new_legend = h(2);
+        end
+        
         function update_font(obj)
             h = obj.axes_handle;
             h.FontName = obj.FontName;
@@ -89,12 +94,47 @@ classdef dapAxes < handle
     end
     
     properties (Access = private)
-        figure_handle matlab.graphics.Graphics
+        container_handle matlab.graphics.Graphics
+        layout_handle matlab.graphics.layout.TiledChartLayout
         axes_handle matlab.graphics.Graphics
+        legend_handle matlab.graphics.illustration.Legend
+    end
+    
+    properties (Access = private, Constant)
+        LAYOUT_M = 1;
+        LAYOUT_N = 3;
+        AXES_TILE_SPAN (1,2) double = [dapAxes.LAYOUT_M dapAxes.LAYOUT_N-1];
+        LEGEND_TILE_SPAN (1,2) double = [dapAxes.LAYOUT_M dapAxes.LAYOUT_N];
+        LEGEND_TILE (1,1) double = 2; % NO idea why this works and 3 doesn't.
     end
     
     methods (Access = private)
+        function layout_handle = build_layout(obj, container_handle)
+            h = tiledlayout(container_handle, obj.LAYOUT_M, obj.LAYOUT_N);
+            h.Padding = "tight";
+            h.TileSpacing = "tight";
+            layout_handle = h;
+        end
         
+        function axes_handle = build_axes(obj, layout_handle)
+            h = nexttile(layout_handle, 1, obj.AXES_TILE_SPAN);
+            hold(h, "on");
+            h.Units = "pixels";
+            h.Box = "on";
+            h.PlotBoxAspectRatio = [1 1 1];
+            h.Interactions = [];
+            h.Toolbar = [];
+            axes_handle = h;
+        end
+        
+        function legend_handle = build_legend(obj, axes_handle)
+            h = legend(axes_handle);
+            h.Location = "layout";
+            h.Layout.TileSpan = obj.LEGEND_TILE_SPAN;
+            h.Layout.Tile = obj.LEGEND_TILE;
+            h.Units = "pixels";
+            legend_handle = h;
+        end
     end
 end
 

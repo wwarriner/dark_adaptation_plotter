@@ -25,6 +25,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         dap_plots = []
         dap_data = []
         font_settings = []
+        dap_input_files = []
         dap_output_files = []
         sort_state = 0
     end
@@ -114,6 +115,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             font_opt.update();
             
             dof = dapOutputFiles(da);
+            dif = dapInputFiles(dd, dt, dp);
             
             app.dap_axes = da;
             app.dap_data = dd;
@@ -121,6 +123,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             app.dap_plots = dp;
             app.font_settings = font_opt;
             app.dap_output_files = dof;
+            app.dap_input_files = dif;
             
             resize(app);
         end
@@ -136,23 +139,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         
         % Menu selected function: OpenDataMenu
         function OpenDataMenuSelected(app, event)
-            file = uigetfile("*.csv");
-            if file == 0
-                return;
-            end
-            
-            d = uiprogressdlg(app.UIFigure);
-            d.Message = "Loading file...";
-            d.Title = "Loading";
-            d.Indeterminate = true;
-            
-            closer = onCleanup(@()d.close());
-            
-            app.dap_data.load(file);
-            existing_ids = app.dap_table.ids; % TODO check plots
-            [patients, ids] = app.dap_data.get_all_except(existing_ids);
-            app.dap_table.add(ids);
-            app.dap_plots.add(patients);
+            app.dap_input_files.ui_open_file(app.UIFigure)
         end
         
         % Cell edit callback: Table

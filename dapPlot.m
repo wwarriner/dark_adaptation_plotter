@@ -54,7 +54,7 @@ classdef dapPlot < handle
     end
     
     properties (Access = private)
-        config Settings
+        config Config
         patient dapPatient
         
         scatter dapScatter

@@ -1,0 +1,42 @@
+{
+  "axes": {
+    "x": {
+      "label": {
+        "value": "Minutes following photobleach",
+        "default": "Minutes following photobleach"
+      },
+      "min": { "value": 0.0, "default": 0.0 },
+      "max": { "value": 50.0, "default": 50.0 },
+      "step": { "value": 5.0, "default": 5.0 },
+      "minor_step": { "value": 1.0, "default": 1.0 }
+    },
+    "y": {
+      "label": {
+        "value": "Log Sensitivity",
+        "default": "Log Sensitivity"
+      },
+      "min": { "value": 0.0, "default": 0.0 },
+      "max": { "value": 5.0, "default": 5.0 },
+      "step": { "value": 0.5, "default": 0.5 },
+      "minor_step": { "value": 0.1, "default": 0.1 }
+    },
+    "font": {
+      "name": { "value": "helvetica", "default": "helvetica" },
+      "size": { "value": 16, "default": 16 },
+      "weight": { "value": "normal", "default": "normal" },
+      "angle": { "value": "normal", "default": "normal" }
+    }
+  },
+  "plot": {
+    "arrow": {
+      "width": { "value": 2, "default": 2 },
+      "head_size_pt": { "value": [24, 24], "default": [24, 24] }
+    },
+    "scatter": { "marker_size": { "value": 8, "default": 8 } }
+  },
+  "recovery_line": {
+    "y": { "value": 3.0, "default": 3.0 },
+    "width": { "value": 2.0, "default": 2.0 },
+    "style": { "value": ":", "default": ":" }
+  }
+}

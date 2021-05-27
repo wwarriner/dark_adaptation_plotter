@@ -1,6 +1,6 @@
-classdef Settings < DynamicPropertyTree
+classdef Config < DynamicPropertyTree
     methods
-        function obj = Settings(file)
+        function obj = Config(file)
             if nargin == 0
                 return;
             end

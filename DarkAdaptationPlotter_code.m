@@ -27,6 +27,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         font_settings = []
         dap_input_files = []
         dap_output_files = []
+        dap_preferences = []
         sort_state = 0
     end
     
@@ -98,32 +99,32 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         function startupFcn(app)
             extend_search_path();
             
-            da = dapAxes(app.AxesPanel);
+            config = Config("config.json");
+            
+            da = dapAxes(app.AxesPanel, config);
             
             recovery_line = dapRecoveryLine();
             da.draw_on(@recovery_line.draw);
+            da.register_callback("recovery_line", @recovery_line.update);
             da.update();
             
             dd = dapData();
             dt = dapPlotTable(app.Table);
             dp = dapPlots(da);
             
-            % TODO config defaults
-            font_opt = FontSettings("Helvetica", 24, "normal", "normal");
-            font_opt.register(app.Table);
-            font_opt.register(da, @da.update_font);
-            font_opt.update();
-            
             dof = dapOutputFiles(da);
             dif = dapInputFiles(dd, dt, dp);
+            
+            dpref = dapPreferences(config);
+            dpref.register_callback("dapAxes", @da.update);
             
             app.dap_axes = da;
             app.dap_data = dd;
             app.dap_table = dt;
             app.dap_plots = dp;
-            app.font_settings = font_opt;
             app.dap_output_files = dof;
             app.dap_input_files = dif;
+            app.dap_preferences = dpref;
             
             resize(app);
         end
@@ -135,11 +136,6 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             end
             
             resize(app);
-        end
-        
-        % Menu selected function: OpenDataMenu
-        function OpenDataMenuSelected(app, event)
-            app.dap_input_files.ui_open_file(app.UIFigure)
         end
         
         % Cell edit callback: Table
@@ -178,8 +174,19 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             end
         end
         
+        % Menu selected function: OpenDataMenu
+        function OpenDataMenuSelected(app, event)
+            assert(~isempty(app.dap_input_files));
+            app.dap_input_files.ui_open_file(app.UIFigure)
+        end
+        
         % Menu selected function: ClearDataMenu
         function ClearDataMenuSelected(app, event)
+            assert(~isempty(app.dap_data));
+            assert(~isempty(app.dap_plots));
+            assert(~isempty(app.dap_table));
+            assert(~isempty(app.dap_axes));
+            
             CLEAR_OPT = "Clear all data";
             CANCEL_OPT = "Go back";
             CANCEL_NUM = 2;
@@ -203,6 +210,34 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             end
         end
         
+        % Menu selected function: ExportPreviewMenu
+        function ExportPreviewMenuSelected(app, event)
+            app.dap_output_files.ui_run_export_preview();
+        end
+        
+        % Menu selected function: ExportAsMenu
+        function ExportAsMenuSelected(app, event)
+            assert(~isempty(app.dap_output_files));
+            app.dap_output_files.ui_run_export_as();
+        end
+        
+        % Menu selected function: ExitMenu
+        function ExitMenuSelected(app, event)
+            app.UIFigureCloseRequest(event);
+        end
+        
+        % Menu selected function: FontMenu
+        function FontMenuSelected(app, event)
+            assert(~isempty(app.dap_preferences));
+            app.dap_preferences.ui_update_font();
+        end
+        
+        % Menu selected function: PreferencesMenu
+        function PreferencesMenuSelected(app, event)
+            assert(~isempty(app.dap_preferences));
+            app.dap_preferences.ui_update_preferences();
+        end
+        
         % Close request function: UIFigure
         function UIFigureCloseRequest(app, event)
             EXIT_OPT = "Exit now";
@@ -221,56 +256,6 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
                 case CANCEL_OPT; return;
                 otherwise; assert(false);
             end
-        end
-        
-        % Menu selected function: ExitMenu
-        function ExitMenuSelected(app, event)
-            app.UIFigureCloseRequest(event);
-        end
-        
-        % Menu selected function: ExportPreviewMenu
-        function ExportPreviewMenuSelected(app, event)
-            app.dap_output_files.ui_run_export_preview();
-        end
-        
-        % Callback function
-        function PreferencesMenuSelected(app, event)
-            % TODO bring up preferences dialog
-            % export options - png image size
-            %
-        end
-        
-        % Menu selected function: FontMenu
-        function FontMenuSelected(app, event)
-            assert(~isempty(app.font_settings));
-            
-            app.font_settings.ui_get();
-        end
-        
-        % Menu selected function: ExportAsMenu
-        function ExportAsMenuSelected(app, event)
-            app.dap_output_files.ui_run_export_as();
-        end
-        
-        % Display data changed function: Table
-        function TableDisplayDataChanged(app, event)
-            if event.InteractionColumn ~= app.dap_table.ID_COL
-                return;
-            end
-            
-            newDisplayData = app.Table.DisplayData;
-            switch app.sort_state
-                case 0
-                    [~, ndx] = natsort(app.Table.Data(:, event.InteractionColumn));
-                    app.sort_state = 1;
-                case 1
-                    [~, ndx] = natsort(app.Table.Data(:, event.InteractionColumn));
-                    ndx = flipud(ndx);
-                    app.sort_state = 0;
-                otherwise
-                    assert(false);
-            end
-            app.Table.Data = app.Table.Data(ndx, :);
         end
     end
     
@@ -330,6 +315,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             
             % Create PreferencesMenu
             app.PreferencesMenu = uimenu(app.EditMenu);
+            app.PreferencesMenu.MenuSelectedFcn = createCallbackFcn(app, @PreferencesMenuSelected, true);
             app.PreferencesMenu.Text = 'Preferences...';
             
             % Create HelpParentMenu
@@ -354,7 +340,6 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             app.Table.ColumnEditable = [false true true true];
             app.Table.CellEditCallback = createCallbackFcn(app, @TableCellEdit, true);
             app.Table.CellSelectionCallback = createCallbackFcn(app, @TableCellSelection, true);
-            app.Table.DisplayDataChangedFcn = createCallbackFcn(app, @TableDisplayDataChanged, true);
             app.Table.Position = [1 1 239.754098360656 600];
             
             % Create AxesPanel

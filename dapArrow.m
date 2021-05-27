@@ -1,8 +1,10 @@
 classdef dapArrow < handle
     properties
+        % CONFIG
         line_width (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 2
         head_size_pt (1,2) double {mustBeReal,mustBeFinite,mustBePositive} = [24 24]
         
+        % API
         start (1,2) double
         stop (1,2) double
         color Color = Color.BLUE()

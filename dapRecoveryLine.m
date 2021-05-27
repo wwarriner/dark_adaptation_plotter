@@ -1,8 +1,11 @@
 classdef dapRecoveryLine < handle
     properties
+        % CONFIG
         y (1,1) double {mustBeReal,mustBeFinite} = 3.0
         line_width (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 2.0
         line_style (1,1) string = ":"
+        
+        % API
         color Color = Color.BLACK();
     end
     

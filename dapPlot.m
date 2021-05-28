@@ -1,6 +1,7 @@
 classdef dapPlot < handle
     properties
         marker (1,1) string = "d"
+        marker_size (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 8
         color Color = Color.BLUE()
         visible (1,1) logical = false
         display_name (1,1) string = ""
@@ -41,6 +42,7 @@ classdef dapPlot < handle
         
         function update(obj)
             obj.scatter.marker = obj.marker;
+            obj.scatter.marker_size = obj.marker_size;
             obj.scatter.color = obj.color;
             obj.scatter.visible = obj.visible;
             obj.scatter.display_name = obj.display_name;

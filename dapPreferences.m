@@ -28,12 +28,15 @@ classdef dapPreferences < handle
             obj.push_update();
         end
         
-        function ui_update_preferences(obj)
+        function ui_update_preferences(obj, x, y)
             old_config = obj.config.copy();
             
             f = uifigure();
             f.Scrollable = "on";
-            f.Position = [50 50 440 600];
+            W = 440;
+            H = 300;
+            y = y - H;
+            f.Position = [x y W H];
             f.WindowStyle = "modal";
             f.Resize = "off";
             
@@ -121,6 +124,8 @@ classdef dapPreferences < handle
             cancel.Text = "Cancel";
             cancel.Position = [x, obj.PAD, w, obj.HEIGHT];
             cancel.ButtonPushedFcn = @(~, ~)obj.cancel_callback_fn(old_config, f);
+            
+            uiwait(f);
         end
     end
     

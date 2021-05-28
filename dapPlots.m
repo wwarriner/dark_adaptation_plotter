@@ -77,6 +77,16 @@ classdef dapPlots < handle
             plot.update();
         end
         
+        function update_marker_size(obj, id, size)
+            assert(isscalar(size));
+            assert(isnumeric(size));
+            assert(0.0 < size);
+            
+            plot = obj.plots(id);
+            plot.marker_size = size;
+            plot.update();
+        end
+        
         function update_draw(obj)
             current_ids = obj.ids;
             for i = 1 : numel(current_ids)

@@ -1,10 +1,7 @@
 classdef dapScatter < handle
     properties
-        % CONFIG
-        marker_size (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 8
-        
-        % API
         marker (1,1) string = "d"
+        marker_size (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 8
         color Color = Color.BLUE()
         visible (1,1) logical = false
         display_name (1,1) string = ""

@@ -21,10 +21,11 @@ classdef dapPreferences < handle
             s = uisetfont(s);
             if isnumeric(s); return; end
             
-            obj.update_value(f.name, s.FontName);
-            obj.update_value(f.size, s.FontSize);
-            obj.update_value(f.weight, s.FontWeight);
-            obj.update_value(f.angle, s.FontAngle);
+            f.name = s.FontName;
+            f.size = s.FontSize;
+            f.weight = s.FontWeight;
+            f.angle = s.FontAngle;
+            obj.push_update();
         end
         
         function ui_update_preferences(obj)

@@ -1,104 +1,98 @@
 {
-"axes":{
-	"font":{
-		"angle":{
-			"default":"normal",
-			"value":"normal"
-			},
-		"name":{
-			"default":"helvetica",
-			"value":"helvetica"
-			},
-		"size":{
-			"default":16,
-			"value":16
-			},
-		"weight":{
-			"default":"normal",
-			"value":"normal"
-			}
-		},
-	"x":{
-		"label":{
-			"default":"Minutes following photobleach",
-			"value":"Minutes following photobleach"
-			},
-		"max":{
-			"default":50,
-			"value":50
-			},
-		"min":{
-			"default":0,
-			"value":0
-			},
-		"minor_step":{
-			"default":1,
-			"value":1
-			},
-		"step":{
-			"default":5,
-			"value":5
-			}
-		},
-	"y":{
-		"label":{
-			"default":"Log Sensitivity",
-			"value":"Log Sensitivity"
-			},
-		"max":{
-			"default":5,
-			"value":5
-			},
-		"min":{
-			"default":0,
-			"value":0
-			},
-		"minor_step":{
-			"default":0.1,
-			"value":0.1
-			},
-		"step":{
-			"default":0.5,
-			"value":0.5
-			}
-		}
-	},
-"plot":{
-	"arrow":{
-		"head_size_pt":{
-			"default":[
-				24,
-				24
-				],
-				"value":[
-					24,
-					24
-					]
-				},
-			"width":{
-				"default":2,
-				"value":2
-				}
-			},
-		"scatter":{
-			"marker_size":{
-				"default":8,
-				"value":8
-				}
-			}
-		},
-	"recovery_line":{
-		"style":{
-			"default":":",
-			"value":":"
-			},
-		"width":{
-			"default":2,
-			"value":2
-			},
-		"y":{
-			"default":3,
-			"value":3
-			}
-		}
+  "axes": {
+    "font": {
+      "angle": {
+        "default": "normal",
+        "value": "normal"
+      },
+      "name": {
+        "default": "helvetica",
+        "value": "helvetica"
+      },
+      "size": {
+        "default": 16,
+        "value": 16
+      },
+      "weight": {
+        "default": "normal",
+        "value": "normal"
+      }
+    },
+    "x": {
+      "label": {
+        "default": "Minutes following photobleach",
+        "value": "Minutes following photobleach"
+      },
+      "max": {
+        "default": 50,
+        "value": 50
+      },
+      "min": {
+        "default": 0,
+        "value": 0
+      },
+      "minor_step": {
+        "default": 1,
+        "value": 1
+      },
+      "step": {
+        "default": 5,
+        "value": 5
+      }
+    },
+    "y": {
+      "label": {
+        "default": "Log Sensitivity",
+        "value": "Log Sensitivity"
+      },
+      "max": {
+        "default": 5,
+        "value": 5
+      },
+      "min": {
+        "default": 0,
+        "value": 0
+      },
+      "minor_step": {
+        "default": 0.1,
+        "value": 0.1
+      },
+      "step": {
+        "default": 0.5,
+        "value": 0.5
+      }
+    }
+  },
+  "plot": {
+    "arrow": {
+      "head_size_pt": {
+        "default": [24, 24],
+        "value": [24, 24]
+      },
+      "width": {
+        "default": 2,
+        "value": 2
+      }
+    },
+    "scatter": {
+      "marker_size": {
+        "default": 8,
+        "value": 8
+      }
+    }
+  },
+  "recovery_line": {
+    "style": {
+      "default": ":",
+      "value": ":"
+    },
+    "width": {
+      "default": 2,
+      "value": 2
+    },
+    "y": {
+      "default": 3,
+      "value": 3
+    }
+  }
 }

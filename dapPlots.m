@@ -76,6 +76,16 @@ classdef dapPlots < handle
             plot.marker = marker;
             plot.update();
         end
+        
+        function update_draw(obj)
+            current_ids = obj.ids;
+            for i = 1 : numel(current_ids)
+                plot = obj.plots(current_ids(i));
+                if plot.visible
+                    plot.update();
+                end
+            end
+        end
     end
     
     methods % properties

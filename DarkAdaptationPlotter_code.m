@@ -117,6 +117,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             
             dpref = dapPreferences(config);
             dpref.register_callback("dapAxes", @da.update);
+            dpref.register_callback("dapPlots", @dp.update_draw);
             
             app.dap_axes = da;
             app.dap_data = dd;

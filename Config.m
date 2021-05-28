@@ -1,4 +1,8 @@
 classdef Config < DynamicPropertyTree
+    properties (Access = private)
+        file (1,1) string
+    end
+    
     methods
         function obj = Config(file)
             if nargin == 0
@@ -8,10 +12,10 @@ classdef Config < DynamicPropertyTree
             file = string(file);
             assert(isscalar(file));
             
-            obj.read_from_file(file);
+            obj.read(file);
         end
         
-        function read_from_file(obj, file)
+        function read(obj, file)
             assert(isfile(file));
             
             s = read_json_file(file);
@@ -20,7 +24,7 @@ classdef Config < DynamicPropertyTree
             obj.file = file;
         end
         
-        function apply(obj, other_obj, silent)
+        function apply_to(obj, other_obj, silent)
             if nargin < 3
                 silent = false;
             end
@@ -42,11 +46,50 @@ classdef Config < DynamicPropertyTree
             end
         end
         
+        function varargout = subsref(obj, s)
+            switch s(1).type
+                case "."
+                    if numel(s) == 1
+                        if s(1).subs == "file"
+                            varargout{1} = obj.file;
+                        else
+                            [varargout{1:nargout}] = obj.subsref@DynamicPropertyTree(s);
+                        end
+                    else
+                        [varargout{1:nargout}] = builtin("subsref", obj, s);
+                    end
+                case "()"
+                    [varargout{1:nargout}] = builtin("subsref", obj, s);
+                case "{}"
+                    [varargout{1:nargout}] = builtin("subsref", obj, s);
+                otherwise
+                    assert(false);
+            end  
+        end
+        
         function obj = subsasgn(obj, s, varargin)
-            obj = subsasgn@DynamicPropertyTree(obj, s, varargin{:});
-            if obj.file ~= "" && obj.is_mutable()
-                obj.write(obj.file);
-            end
+            switch s(1).type
+                case "."
+                    if numel(s) == 1
+                        if s(1).subs == "file"
+                            obj.file = varargin{1};
+                        else
+                            obj.subsasgn@DynamicPropertyTree(s, varargin{:});
+                        end
+                    else
+                        obj = builtin("subsasgn", obj, s, varargin{:});
+                    end
+                case "()"
+                    obj = builtin("subsasgn", obj, s, varargin{:});
+                case "{}"
+                    obj = builtin("subsasgn", obj, s, varargin{:});
+                otherwise
+                    assert(false);
+            end  
+        end
+        
+        function save(obj)
+            obj.write(obj.file);
         end
         
         function write(obj, file)
@@ -55,14 +98,5 @@ classdef Config < DynamicPropertyTree
             s = obj.struct();
             write_json_file(file, s);
         end
-        
-        function value = properties( obj )
-            value = properties@DynamicPropertyTree( obj );
-        end
-    end
-    
-    properties (Access = private)
-        file (1,1) string
     end
 end
-

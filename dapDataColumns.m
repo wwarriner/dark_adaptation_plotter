@@ -1,4 +1,23 @@
 classdef dapDataColumns
+    %{
+    Dev Notes
+    The intent of this class is to encapsulate most of the fuzzy loading logic.
+    The strategy is basically a triple loop. The outer loop is over any columns
+    available in a file being loaded, in the normalize() function.
+
+    The next loop
+    is over the columns supplied to this constructor as "names", checking for
+    matches. If a match is found that name is removed from further
+    consideration.
+    
+    The last loop is over the "variants" of each of the "names". For example
+    "sensitivity" and "value" may be equally valid, so we want to check for
+    both.
+    
+    Currently we'll accept as a match anything that startsWith() or endsWith()
+    any of the variants, though this is open to ideas.
+    %}
+    
     methods
         function obj = dapDataColumns(names, variants)
             %{
@@ -36,7 +55,7 @@ classdef dapDataColumns
             1. new_cols - string array of normalized columns
             2. missed - any names missed during normalization
             %}
-          
+            
             assert(isstring(cols));
             new_cols = cols;
             names_to_check = obj.names;
@@ -61,7 +80,7 @@ classdef dapDataColumns
         function [new_col, names_to_check] = normalize_column(obj, col, names_to_check)
             %{
             Attempts to find a matching name in input list of names. Returns
-            after first match. Output will be input if no match found, may be 
+            after first match. Output will be input if no match found, may be
             changed to canonical form if match found, if not already in
             canonical form. Available columns will be returned with match
             removed.
@@ -101,10 +120,18 @@ classdef dapDataColumns
     
     methods (Access = private, Static)
         function s = mangle(s)
-            % replace all other punctuation with "_"
+            %{
+            Mangles a string into a form acceptable to MATLAB tables. MATLAB has
+            yet to provide a stable API for this feature, so we have made a
+            stable version ourselves.
+            
+            Transforms any string into lowercase alphanumeric and literal
+            underscore.
+            %}
+            % replace all punctuation with "_"
             s = regexprep(s, "([`=\[\]\\;',/~!@#\$%\^&\*\(\)\+{}|:""<>\?\-\.])", "_");
-            % replace inline whitespace "_"
-            s = regexprep(s, "([ \t-\.])", "_");
+            % replace inline whitespace with "_"
+            s = regexprep(s, "([ \t])", "_");
             % deduplicate "_"
             s = regexprep(s, "([_]){2,}", "_");
             s = strip(s, "_");

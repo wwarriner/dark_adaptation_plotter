@@ -1,4 +1,15 @@
 classdef dapScatter < handle
+    %{
+    Encapsulates a plot handle intended for display as a scatter plot. Not
+    literally a MATLAB scatter handle.
+
+    The strategy for this object is to:
+    1. construct
+    2. draw on one or more axes
+    3. modify its public properties
+    4. update the object
+    %}
+    
     properties
         marker (1,1) string = "d"
         marker_size (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 8
@@ -9,6 +20,11 @@ classdef dapScatter < handle
     
     methods
         function obj = dapScatter(x, y)
+            %{
+            Inputs:
+            1. x - x-axis numeric vector
+            2. y - y-axis numeric vector of the same length as x
+            %}
             obj.x = x;
             obj.y = y;
         end
@@ -18,6 +34,9 @@ classdef dapScatter < handle
         end
         
         function draw(obj, axh)
+            %{
+            Draws this object onto an axes or uiaxes.
+            %}
             assert(isa(axh, "matlab.graphics.axis.Axes"));
             
             ph = plot(axh, obj.x, obj.y);

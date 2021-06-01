@@ -9,8 +9,20 @@ classdef dapScatter < handle
     
     methods
         function obj = dapScatter(x, y)
+            assert(isnumeric(x));
+            assert(isvector(x));
+            
+            assert(isnumeric(y));
+            assert(isvector(y));
+            
+            assert(numel(x) == numel(y));
+            
+            x = double(x);
+            y = double(y);
+            
             obj.x = x;
             obj.y = y;
+            obj.plot_handle = matlab.graphics.chart.primitive.Line;
         end
         
         function delete(obj)
@@ -19,11 +31,14 @@ classdef dapScatter < handle
         
         function draw(obj, axh)
             assert(isa(axh, "matlab.graphics.axis.Axes"));
+            assert(~isempty(obj.plot_handle));
             
-            ph = plot(axh, obj.x, obj.y);
-            ph.Annotation.LegendInformation.IconDisplayStyle = "off";
-            obj.plot_handle = ph;
+            assert(isscalar(axh));
+            valid = isa(axh, "matlab.ui.control.UIAxes") ...
+                | isa(axh, "matlab.graphics.axis.Axes");
+            assert(valid);
             
+            obj.plot_handle.Parent = axh;
             obj.update();
         end
         
@@ -54,4 +69,3 @@ classdef dapScatter < handle
         y (:,1) double
     end
 end
-

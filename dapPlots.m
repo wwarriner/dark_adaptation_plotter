@@ -30,8 +30,8 @@ classdef dapPlots < handle
             for i = 1 : numel(patients)
                 patient = patients{i};
                 plot = dapPlot(patient);
-                plot.display_name = patient.id;
-                obj.dap_axes.draw_on(@plot.draw);
+                plot.legend_display_name = patient.id;
+                obj.dap_axes.draw_on(@plot.set_parent);
                 id = patient.id;
                 obj.plots(char(id)) = plot;
             end

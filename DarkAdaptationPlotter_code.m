@@ -112,7 +112,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             da = dapAxes(app.AxesPanel, config);
             
             recovery_line = dapRecoveryLine();
-            da.draw_on(@recovery_line.draw);
+            da.draw_on(@recovery_line.set_parent);
             da.register_callback("recovery_line", @recovery_line.update);
             da.update();
             

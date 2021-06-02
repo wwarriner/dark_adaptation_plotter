@@ -101,7 +101,7 @@ classdef dapArrow < handle
     properties (Access = private)
         head_handle matlab.graphics.primitive.Patch
         line_handle matlab.graphics.primitive.Line
-        axes_handle matlab.graphics.axis.Axes
+        axes_handle
     end
     
     methods (Access = private)

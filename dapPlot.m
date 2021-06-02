@@ -46,6 +46,9 @@ classdef dapPlot < handle
         end
         
         function update(obj)
+            assert(~isempty(obj.arrow));
+            assert(~isempty(obj.scatter));
+            
             obj.scatter.x = obj.patient.time;
             obj.scatter.y = obj.patient.sensitivity;
             obj.scatter.marker = obj.marker;
@@ -55,8 +58,9 @@ classdef dapPlot < handle
             obj.scatter.legend_display_name = obj.legend_display_name;
             
             r = obj.patient.recovery_time;
-            obj.arrow.head = [r obj.axes_handle.YLim(2)];
-            obj.arrow.tail = [r 3.0]; % 3.0 = recovery_log_sensitivity from config
+            obj.arrow.head = [r obj.axes_handle.YLim(2)]; % always touches edge of axes
+            obj.arrow.tail = [r 3.0]; % always starts at recovery line, 3.0 = recovery_log_sensitivity from config
+            % TODO tie this to recovery line
             obj.arrow.color = obj.color;
             obj.arrow.visible = obj.visible;
             
@@ -72,7 +76,7 @@ classdef dapPlot < handle
         arrow dapArrow
         scatter dapScatter
         
-        axes_handle matlab.graphics.Graphics
+        axes_handle
     end
     
     methods (Access = private)

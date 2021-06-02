@@ -10,7 +10,7 @@ classdef dapRecoveryLine < handle
     end
     
     methods
-        function draw(obj, axh)
+        function set_parent(obj, axh)
             assert(isa(axh, "matlab.graphics.axis.Axes"));
             
             ph = hline(axh, obj.y);

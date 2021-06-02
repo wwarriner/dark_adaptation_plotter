@@ -30,7 +30,7 @@ classdef dapPlot < handle
             obj.scatter = dapScatter();
         end
         
-        function draw(obj, axh)
+        function set_parent(obj, axh)
             assert(~isempty(obj.arrow));
             assert(~isempty(obj.scatter));
             
@@ -39,8 +39,8 @@ classdef dapPlot < handle
                 | isa(axh, "matlab.graphics.axis.Axes");
             assert(valid);
             
-            obj.arrow.draw(axh);
-            obj.scatter.draw(axh);
+            obj.arrow.set_parent(axh);
+            obj.scatter.set_parent(axh);
             obj.axes_handle = axh;
             obj.update();
         end

@@ -54,7 +54,7 @@ classdef dapScatter < handle
             delete(obj.plot_handle);
         end
         
-        function draw(obj, axh)
+        function set_parent(obj, axh)
             assert(~isempty(obj.plot_handle));
             
             assert(isscalar(axh));

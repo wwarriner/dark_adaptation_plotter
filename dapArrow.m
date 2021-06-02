@@ -51,7 +51,7 @@ classdef dapArrow < handle
             delete(obj.line_handle);
         end
         
-        function draw(obj, axh)
+        function set_parent(obj, axh)
             assert(~isempty(obj.head_handle));
             assert(~isempty(obj.line_handle));
             

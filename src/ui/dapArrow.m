@@ -74,23 +74,50 @@ classdef dapArrow < handle
                 return;
             end
             
-            scale = obj.get_scale(obj.axes_handle);
-            [x_line, y_line] = obj.compute_line();
-            r = obj.compute_rotation_matrix(x_line, y_line, scale);
-            extent = compute_extent(obj, obj.axes_handle);
-            [x_tri, y_tri] = obj.compute_triangle(r, scale, extent);
+            X = 1; Y = 2;
+            TAIL = 1; HEAD = 2;
             
+            s = obj.get_scale_data_per_pt(); % multiply to convert pt -> data
+            
+            % compute line
+            line = [obj.tail; obj.head]; % data
+            
+            % find pt-space angle of line
+            inv_line = (s^(-1) * line.').'; % data -> pt
+            d_inv_line = diff(inv_line); % pt
+            theta_inv_line = cart2pol(d_inv_line(X), d_inv_line(Y)); % pt
+            
+            % compute head triangle
+            BASE_TRIANGLE = [-1 -0.5; 0 0; -1 0.5]; % origin is at tip, unitless
+            tri = BASE_TRIANGLE .* obj.head_size_pt; % pt
+            r = obj.compute_rotation_matrix(theta_inv_line); % pt
+            tri = (s * r * tri.').'; % pt -> data
+            tri = tri + obj.head; % data
+            
+            % move head of line to base of head triangle to avoid line visible
+            % at tip of triangle
+            m = mean(tri([1 3], :)); % mid-base, data
+            a = tri(2, :); % apex, data
+            d_tri = sqrt(sum((m-a).^2)); % data
+            d_line = diff(line); % data
+            [theta_line, r_line] = cart2pol(d_line(X), d_line(Y)); % data
+            r_line = r_line - d_tri; % data
+            [d_x, d_y] = pol2cart(theta_line, r_line); % data
+            line(HEAD, X) = line(TAIL, X) + d_x; % data
+            line(HEAD, Y) = line(TAIL, Y) + d_y; % data
+            
+            % update
             h = obj.head_handle;
-            h.XData = x_tri;
-            h.YData = y_tri;
+            h.XData = tri(:, X);
+            h.YData = tri(:, Y);
             h.FaceColor = obj.color.rgb;
-            h.EdgeColor = obj.color.rgb;
+            h.EdgeColor = "none";
             h.Annotation.LegendInformation.IconDisplayStyle = "off";
             h.Visible = obj.visible;
             
             h = obj.line_handle;
-            h.XData = x_line;
-            h.YData = y_line;
+            h.XData = line(:, X);
+            h.YData = line(:, Y);
             h.Color = obj.color.rgb;
             h.LineWidth = obj.line_width;
             h.Annotation.LegendInformation.IconDisplayStyle = "off";
@@ -104,48 +131,39 @@ classdef dapArrow < handle
         axes_handle
     end
     
+    properties (Access = private, Constant)
+        
+    end
+    
     methods (Access = private)
-        function [x, y] = compute_line(obj)
-            x = [obj.tail(1) obj.head(1)];
-            y = [obj.tail(2) obj.head(2)];
+        function scale = get_scale_data_per_pt(obj)
+            d_ax_pts = obj.get_axes_length_pts(); % pt
+            d_ax_data = obj.get_axes_length_data(); % data
+            scale = d_ax_data ./ d_ax_pts; % data/pt
+            scale = [...
+                scale(1) 0; ...
+                0 scale(2); ...
+                ];
         end
         
-        function [x, y] = compute_triangle(obj, r, scale, extent)
-            x_tri = [-1, 0, -1] .* extent(1);
-            y_tri = [-0.5, 0, 0.5] .* extent(2);
-            
-            tri = (r * [x_tri; y_tri]).';
-            tri = tri .* scale(1 : 2) + obj.head;
-            
-            x = tri(:, 1);
-            y = tri(:, 2);
+        function d = get_axes_length_data(obj)
+            axh = obj.axes_handle;
+            d = diff([axh.XLim; axh.YLim].');
         end
         
-        function extent = compute_extent(obj, axh)
-            x_axis_pts = obj.get_x_axis_pts(axh);
-            extent = obj.head_size_pt ./ x_axis_pts;
+        function d = get_axes_length_pts(obj)
+            axh = obj.axes_handle;
+            old_units = axh.Units;
+            unit_cleanup = onCleanup(@()dapArrow.restore_units(axh, old_units));
+            axh.Units = 'points';
+            d = axh.InnerPosition(3:4);
         end
     end
     
     methods (Access = private, Static)
-        function r = compute_rotation_matrix(x_line, y_line, scale)
-            x_len = (x_line(2) - x_line(1)) ./ scale(1);
-            y_len = (y_line(2) - y_line(1)) ./ scale(2);
-            
-            theta = cart2pol(x_len, y_len);
+        function r = compute_rotation_matrix(theta)
             r = rotz(rad2deg(theta));
             r = r(1:2, 1:2);
-        end
-        
-        function scale = get_scale(axh)
-            scale = axh.DataAspectRatio ./ axh.PlotBoxAspectRatio;
-        end
-        
-        function x_axis_pts = get_x_axis_pts(axh)
-            old_units = axh.Units;
-            unit_cleanup = onCleanup(@()dapArrow.restore_units(axh, old_units));
-            axh.Units = 'points';
-            x_axis_pts = axh.Position(3);
         end
         
         function restore_units(axh, units)

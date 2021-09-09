@@ -13,11 +13,12 @@ classdef dapInputFiles < handle
         function ui_open_file(obj, figure_for_dialogs)
             filter = "*.csv";
             title = "Load CSV data";
-            default_path = obj.folder;
-            [name, path] = uigetfile(filter, title, default_path);
+            default_folder = obj.folder;
+            [name, path] = uigetfile(filter, title, default_folder);
             if name == 0
                 return;
             end
+            obj.folder = string(path);
             file = fullfile(path, name);
             
             d = uiprogressdlg(figure_for_dialogs);

@@ -57,6 +57,12 @@ classdef dapPlots < handle
             plot = obj.plots(id);
             plot.visible = visible;
             plot.update();
+            
+            if visible
+                plot.apply(@(varargin)obj.dap_axes.add_to_legend(varargin{:}));
+            else
+                plot.apply(@(varargin)obj.dap_axes.remove_from_legend(varargin{:}));
+            end
         end
         
         function update_color(obj, id, color)

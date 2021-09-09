@@ -45,6 +45,13 @@ classdef dapPlot < handle
             obj.update();
         end
         
+        function varargout = apply(obj, fn)
+            %{
+            fn - function which accepts plot handle and string label
+            %}
+            [varargout{1:nargout}] = obj.scatter.apply(fn);
+        end
+        
         function update(obj)
             assert(~isempty(obj.arrow));
             assert(~isempty(obj.scatter));

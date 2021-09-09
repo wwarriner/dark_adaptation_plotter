@@ -1,0 +1,14 @@
+add column for class/category
+uniform change to point size
+preferences menu title, not modal?
+add export button to "export preview"
+add reset to default button for each field in preferences
+
+set colors for multiple plots
+add groups based on pt class?
+
+send matlab install instructions to Cynthia
+
+
+DONE
+natural sorting order

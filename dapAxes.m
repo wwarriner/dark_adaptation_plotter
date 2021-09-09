@@ -1,25 +1,8 @@
 classdef dapAxes < handle
-    properties
-        x_label (1,1) string = "Minutes following photobleach"
-        x_min (1,1) double {mustBeReal,mustBeFinite} = 0.0
-        x_step (1,1) double {mustBeReal,mustBeFinite} = 5.0
-        x_minor_step (1,1) double {mustBeReal,mustBeFinite} = 1.0
-        x_max (1,1) double {mustBeReal,mustBeFinite} = 25.0
-        
-        y_label (1,1) string = "Log Sensitivity"
-        y_min (1,1) double {mustBeReal,mustBeFinite} = 0.0
-        y_step (1,1) double {mustBeReal,mustBeFinite} = 0.5
-        y_minor_step (1,1) double {mustBeReal,mustBeFinite} = 0.1
-        y_max (1,1) double {mustBeReal,mustBeFinite} = 4.5
-        
-        FontName (1,1) string
-        FontSize (1,1) double
-        FontWeight (1,1) string
-        FontAngle (1,1) string
-    end
-    
     methods
-        function obj = dapAxes(container_handle)
+        function obj = dapAxes(container_handle, config)
+            callbacks = containers.Map("keytype", "char", "valuetype", "any");
+            
             layout_handle = obj.build_layout(container_handle);
             axes_handle = obj.build_axes(layout_handle);
             legend_handle = obj.build_legend(axes_handle);
@@ -29,33 +12,62 @@ classdef dapAxes < handle
             obj.axes_handle = axes_handle;
             obj.legend_handle = legend_handle;
             
+            obj.config = config;
+            obj.callbacks = callbacks;
+            
             obj.update();
         end
         
         function update(obj)
-            x_min_curr = floor_to_nearest(obj.x_min, obj.x_step);
-            x_max_curr = ceil_to_nearest(obj.x_max, obj.x_step);
+            x_label = obj.get_x_value("label");
+            x_min = obj.get_x_value("min");
+            x_step = obj.get_x_value("step");
+            x_minor_step = obj.get_x_value("minor_step");
+            x_max = obj.get_x_value("max");
             
-            y_min_curr = floor_to_nearest(obj.y_min, obj.y_step);
-            y_max_curr = ceil_to_nearest(obj.y_max, obj.y_step);
+            y_label = obj.get_y_value("label");
+            y_min = obj.get_y_value("min");
+            y_step = obj.get_y_value("step");
+            y_minor_step = obj.get_y_value("minor_step");
+            y_max = obj.get_y_value("max");
+            
+            font_name = obj.config.axes.font.name.value;
+            font_size = obj.config.axes.font.size.value;
+            font_weight = obj.config.axes.font.weight.value;
+            font_angle = obj.config.axes.font.angle.value;
             
             h = obj.axes_handle;
             
             h.TickDir = "out";
             h.TickLength = [0.025 0.05];
             
-            h.XLabel.String = obj.x_label;
+            h.XLabel.String = x_label;
+            x_min_curr = floor_to_nearest(x_min, x_step);
+            x_max_curr = ceil_to_nearest(x_max, x_step);
             h.XLim = [x_min_curr x_max_curr];
-            h.XTick = x_min_curr : obj.x_step : x_max_curr;
+            h.XTick = x_min_curr : x_step : x_max_curr;
             h.XAxis.MinorTick = "on";
-            h.XAxis.MinorTickValues = x_min_curr : obj.x_minor_step : x_max_curr;
+            h.XAxis.MinorTickValues = x_min_curr : x_minor_step : x_max_curr;
             
-            h.YLabel.String = obj.y_label;
+            h.YLabel.String = y_label;
+            y_min_curr = floor_to_nearest(y_min, y_step);
+            y_max_curr = ceil_to_nearest(y_max, y_step);
             h.YLim = [y_min_curr y_max_curr];
-            h.YTick = y_min_curr : obj.y_step : y_max_curr;
+            h.YTick = y_min_curr : y_step : y_max_curr;
             h.YAxis.MinorTick = "on";
-            h.YAxis.MinorTickValues = y_min_curr : obj.y_minor_step : y_max_curr;
+            h.YAxis.MinorTickValues = y_min_curr : y_minor_step : y_max_curr;
             h.YAxis.Direction = "reverse";
+            
+            h.FontName = font_name;
+            h.FontSize = font_size;
+            h.FontWeight = font_weight;
+            h.FontAngle = font_angle;
+            
+            keys = string(obj.callbacks.keys());
+            for i = 1 : numel(keys)
+                fn = obj.callbacks(keys(i));
+                fn();
+            end
         end
         
         function varargout = draw_on(obj, draw_fn)
@@ -65,27 +77,44 @@ classdef dapAxes < handle
             [varargout{1:nargout}] = draw_fn(obj.axes_handle);
         end
         
+        function add_to_legend(obj, handle, label)
+            label = string(label);
+            obj.legend_plot_handles = [obj.legend_plot_handles handle];
+            obj.legend_plot_labels = [obj.legend_plot_labels label];
+            obj.update_legend();
+        end
+        
+        function remove_from_legend(obj, handle, ~)
+            index = obj.legend_plot_handles == handle;
+            obj.legend_plot_handles(index) = [];
+            obj.legend_plot_labels(index) = [];
+            obj.update_legend();
+        end
+        
+        function register_callback(obj, tag, fn)
+            obj.callbacks(char(tag)) = fn;
+        end
+        
         function [new_axes, new_legend] = copyobj(obj, parent_handle)
             h = [obj.axes_handle, obj.legend_handle];
             h = copyobj(h, parent_handle);
             new_axes = h(1);
             new_legend = h(2);
         end
-        
-        function update_font(obj)
-            h = obj.axes_handle;
-            h.FontName = obj.FontName;
-            h.FontSize = obj.FontSize;
-            h.FontWeight = obj.FontWeight;
-            h.FontAngle = obj.FontAngle;
-        end
     end
     
     properties (Access = private)
+        config Config
+        
         container_handle matlab.graphics.Graphics
         layout_handle matlab.graphics.layout.TiledChartLayout
         axes_handle matlab.graphics.Graphics
         legend_handle matlab.graphics.illustration.Legend
+        
+        legend_plot_handles matlab.graphics.Graphics
+        legend_plot_labels string
+        
+        callbacks containers.Map
     end
     
     properties (Access = private, Constant)
@@ -121,7 +150,22 @@ classdef dapAxes < handle
             h.Layout.TileSpan = obj.LEGEND_TILE_SPAN;
             h.Layout.Tile = obj.LEGEND_TILE;
             h.Units = "pixels";
+            h.Interpreter = "none";
+            h.AutoUpdate = "off";
             legend_handle = h;
+        end
+        
+        function update_legend(obj)
+            legend(obj.axes_handle, obj.legend_plot_handles);
+            obj.legend_handle.String = obj.legend_plot_labels;
+        end
+        
+        function v = get_x_value(obj, key)
+            v = obj.config.axes.x.(key).value;
+        end
+        
+        function v = get_y_value(obj, key)
+            v = obj.config.axes.y.(key).value;
         end
     end
 end

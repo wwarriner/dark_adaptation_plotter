@@ -1,4 +1,6 @@
-classdef DynamicPropertyTree < dynamicprops & matlab.mixin.CustomDisplay
+classdef DynamicPropertyTree < dynamicprops ...
+        & matlab.mixin.CustomDisplay ...
+        & matlab.mixin.Copyable
     methods
         function obj = DynamicPropertyTree(varargin)
             if nargin == 0
@@ -83,7 +85,7 @@ classdef DynamicPropertyTree < dynamicprops & matlab.mixin.CustomDisplay
                     end
                     obj.(key) = v;
                 case "()"
-                    builtin("subsasgn", obj, varargin{:});
+                    builtin("subsasgn", obj, s, varargin{:});
                 case "{}"
                     builtin("subsasgn", obj, s, varargin{:});
                 otherwise
@@ -111,9 +113,7 @@ classdef DynamicPropertyTree < dynamicprops & matlab.mixin.CustomDisplay
                 throwAsCaller(me);
             end
         end
-    end
-    
-    methods (Access = protected)
+        
         function build(obj, s, type)
             assert(obj.is_mutable());
             assert(isstruct(s));
@@ -134,7 +134,9 @@ classdef DynamicPropertyTree < dynamicprops & matlab.mixin.CustomDisplay
             end
             obj.remove_mutability();
         end
-        
+    end
+    
+    methods (Access = protected)
         function group = getPropertyGroups(obj)
             props = properties(obj);
             group = matlab.mixin.util.PropertyGroup(props);
@@ -144,8 +146,24 @@ classdef DynamicPropertyTree < dynamicprops & matlab.mixin.CustomDisplay
             mutable = obj.is_mutable____;
         end
         
-        function remove_mutability( obj )
+        function remove_mutability(obj)
             obj.is_mutable____ = false;
+        end
+        
+        function new = copyElement(obj)
+            new = feval(class(obj));
+            fields = string(fieldnames(obj));
+            child_count = numel(fields);
+            for i = 1 : child_count
+                key = fields(i);
+                if isa(obj.(key), "DynamicPropertyTree")
+                    value = obj.(key).copy();
+                else
+                    value = obj.(key);
+                end
+                new.addprop(key);
+                new.(key) = value;
+            end
         end
     end
     

@@ -27,6 +27,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         font_settings = []
         dap_input_files = []
         dap_output_files = []
+        dap_preferences = []
         sort_state = 0
     end
     
@@ -35,6 +36,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             app.update_visible(row);
             app.update_color(row);
             app.update_marker(row);
+            app.update_marker_size(row);
         end
         
         function update_visible(app, row)
@@ -49,6 +51,18 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             app.dap_plots.update_color(id, color);
         end
         
+        function update_marker(app, row)
+            id = app.dap_table.get_id(row);
+            marker = app.dap_table.get_marker(row);
+            app.dap_plots.update_marker(id, marker);
+        end
+        
+        function update_marker_size(app, row)
+            id = app.dap_table.get_id(row);
+            size = app.dap_table.get_size(row);
+            app.dap_plots.update_marker_size(id, size);
+        end
+        
         function pick_color(app, row)
             color = app.dap_table.get_color(row);
             color.rgb = uisetcolor(color.rgb, "Select a plot color");
@@ -56,27 +70,22 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             drawnow();
         end
         
-        function update_marker(app, row)
-            id = app.dap_table.get_id(row);
-            marker = app.dap_table.get_marker(row);
-            app.dap_plots.update_marker(id, marker);
-        end
-        
         function resize(app)
             position = app.UIFigure.Position;
             
             % table
             TABLE_X_FRACTION = 0.33;
-            table_x = 1;
-            table_y = 1;
             table_width = round(TABLE_X_FRACTION .* position(3));
+            SCROLLBAR_WIDTH = 18;
+            table_width_for_columns = max(table_width - SCROLLBAR_WIDTH, 0);
+            
             table_height = position(4);
-            app.Table.Position = [table_x table_y table_width table_height];
-            TABLE_WIDTH_WEIGHTS = [96 32 50 60];
-            table_width_fractions = TABLE_WIDTH_WEIGHTS ./ sum(TABLE_WIDTH_WEIGHTS);
-            table_widths = round(app.Table.Position(3) .* table_width_fractions);
-            table_widths(end) = sum(table_widths) - sum(table_widths(1 : end-1)) - 2;
-            app.Table.ColumnWidth = num2cell(table_widths);
+            
+            app.Table.Position = [1 1 table_width table_height];
+            width_weights = app.dap_table.WIDTH_WEIGHTS;
+            width_fractions = width_weights ./ sum(width_weights);
+            column_widths = table_width_for_columns .* width_fractions;
+            app.Table.ColumnWidth = num2cell(column_widths);
             
             % panel
             panel_x = app.Table.Position(1) + app.Table.Position(3) - 1;
@@ -98,32 +107,33 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         function startupFcn(app)
             extend_search_path();
             
-            da = dapAxes(app.AxesPanel);
+            config = Config("config.json");
+            
+            da = dapAxes(app.AxesPanel, config);
             
             recovery_line = dapRecoveryLine();
-            da.draw_on(@recovery_line.draw);
+            da.draw_on(@recovery_line.set_parent);
+            da.register_callback("recovery_line", @recovery_line.update);
             da.update();
             
             dd = dapData();
             dt = dapPlotTable(app.Table);
             dp = dapPlots(da);
             
-            % TODO config defaults
-            font_opt = FontSettings("Helvetica", 24, "normal", "normal");
-            font_opt.register(app.Table);
-            font_opt.register(da, @da.update_font);
-            font_opt.update();
-            
             dof = dapOutputFiles(da);
             dif = dapInputFiles(dd, dt, dp);
+            
+            dpref = dapPreferences(config);
+            dpref.register_callback("dapAxes", @da.update);
+            dpref.register_callback("dapPlots", @dp.update_draw);
             
             app.dap_axes = da;
             app.dap_data = dd;
             app.dap_table = dt;
             app.dap_plots = dp;
-            app.font_settings = font_opt;
             app.dap_output_files = dof;
             app.dap_input_files = dif;
+            app.dap_preferences = dpref;
             
             resize(app);
         end
@@ -135,11 +145,6 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             end
             
             resize(app);
-        end
-        
-        % Menu selected function: OpenDataMenu
-        function OpenDataMenuSelected(app, event)
-            app.dap_input_files.ui_open_file(app.UIFigure)
         end
         
         % Cell edit callback: Table
@@ -156,6 +161,8 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             if col == app.dap_table.VISIBLE_COL
                 app.update_plot(row);
             elseif col == app.dap_table.MARKER_COL
+                app.update_plot(row);
+            elseif col == app.dap_table.SIZE_COL
                 app.update_plot(row);
             end
         end
@@ -178,8 +185,19 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             end
         end
         
+        % Menu selected function: OpenDataMenu
+        function OpenDataMenuSelected(app, event)
+            assert(~isempty(app.dap_input_files));
+            app.dap_input_files.ui_open_file(app.UIFigure)
+        end
+        
         % Menu selected function: ClearDataMenu
         function ClearDataMenuSelected(app, event)
+            assert(~isempty(app.dap_data));
+            assert(~isempty(app.dap_plots));
+            assert(~isempty(app.dap_table));
+            assert(~isempty(app.dap_axes));
+            
             CLEAR_OPT = "Clear all data";
             CANCEL_OPT = "Go back";
             CANCEL_NUM = 2;
@@ -203,6 +221,37 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             end
         end
         
+        % Menu selected function: ExportPreviewMenu
+        function ExportPreviewMenuSelected(app, event)
+            app.dap_output_files.ui_run_export_preview();
+        end
+        
+        % Menu selected function: ExportAsMenu
+        function ExportAsMenuSelected(app, event)
+            assert(~isempty(app.dap_output_files));
+            app.dap_output_files.ui_run_export_as();
+        end
+        
+        % Menu selected function: ExitMenu
+        function ExitMenuSelected(app, event)
+            app.UIFigureCloseRequest(event);
+        end
+        
+        % Menu selected function: FontMenu
+        function FontMenuSelected(app, event)
+            assert(~isempty(app.dap_preferences));
+            app.dap_preferences.ui_update_font();
+        end
+        
+        % Menu selected function: PreferencesMenu
+        function PreferencesMenuSelected(app, event)
+            assert(~isempty(app.dap_preferences));
+            p = app.UIFigure.Position;
+            x = p(1) + 24;
+            y = p(4) + p(2) - 1 - 24;
+            app.dap_preferences.ui_update_preferences(x, y);
+        end
+        
         % Close request function: UIFigure
         function UIFigureCloseRequest(app, event)
             EXIT_OPT = "Exit now";
@@ -221,56 +270,6 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
                 case CANCEL_OPT; return;
                 otherwise; assert(false);
             end
-        end
-        
-        % Menu selected function: ExitMenu
-        function ExitMenuSelected(app, event)
-            app.UIFigureCloseRequest(event);
-        end
-        
-        % Menu selected function: ExportPreviewMenu
-        function ExportPreviewMenuSelected(app, event)
-            app.dap_output_files.ui_run_export_preview();
-        end
-        
-        % Callback function
-        function PreferencesMenuSelected(app, event)
-            % TODO bring up preferences dialog
-            % export options - png image size
-            %
-        end
-        
-        % Menu selected function: FontMenu
-        function FontMenuSelected(app, event)
-            assert(~isempty(app.font_settings));
-            
-            app.font_settings.ui_get();
-        end
-        
-        % Menu selected function: ExportAsMenu
-        function ExportAsMenuSelected(app, event)
-            app.dap_output_files.ui_run_export_as();
-        end
-        
-        % Display data changed function: Table
-        function TableDisplayDataChanged(app, event)
-            if event.InteractionColumn ~= app.dap_table.ID_COL
-                return;
-            end
-            
-            newDisplayData = app.Table.DisplayData;
-            switch app.sort_state
-                case 0
-                    [~, ndx] = natsort(app.Table.Data(:, event.InteractionColumn));
-                    app.sort_state = 1;
-                case 1
-                    [~, ndx] = natsort(app.Table.Data(:, event.InteractionColumn));
-                    ndx = flipud(ndx);
-                    app.sort_state = 0;
-                otherwise
-                    assert(false);
-            end
-            app.Table.Data = app.Table.Data(ndx, :);
         end
     end
     
@@ -330,6 +329,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             
             % Create PreferencesMenu
             app.PreferencesMenu = uimenu(app.EditMenu);
+            app.PreferencesMenu.MenuSelectedFcn = createCallbackFcn(app, @PreferencesMenuSelected, true);
             app.PreferencesMenu.Text = 'Preferences...';
             
             % Create HelpParentMenu
@@ -347,14 +347,13 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             
             % Create Table
             app.Table = uitable(app.UIFigure);
-            app.Table.ColumnName = {'ID'; '👁️'; 'Color'; 'Marker'};
-            app.Table.ColumnWidth = {96, 32, 50, 60};
+            app.Table.ColumnName = {'ID'; '👁️'; 'Color'; 'Marker'; 'Size'};
+            app.Table.ColumnWidth = {96, 32, 50, 60, 32};
             app.Table.RowName = {};
-            app.Table.ColumnSortable = [true true false false];
-            app.Table.ColumnEditable = [false true true true];
+            app.Table.ColumnSortable = [true true false false false];
+            app.Table.ColumnEditable = [false true true true true];
             app.Table.CellEditCallback = createCallbackFcn(app, @TableCellEdit, true);
             app.Table.CellSelectionCallback = createCallbackFcn(app, @TableCellSelection, true);
-            app.Table.DisplayDataChangedFcn = createCallbackFcn(app, @TableDisplayDataChanged, true);
             app.Table.Position = [1 1 239.754098360656 600];
             
             % Create AxesPanel

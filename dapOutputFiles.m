@@ -82,10 +82,6 @@ classdef dapOutputFiles < handle
             fig_height = new_axh.OuterPosition(4);
             fh.Position(3:4) = [fig_width fig_height];
         end
-        
-        function close(obj)
-            obj.is_open = false;
-        end
     end
 end
 

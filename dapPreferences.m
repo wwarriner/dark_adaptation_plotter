@@ -39,6 +39,7 @@ classdef dapPreferences < handle
             f.Position = [x y W H];
             f.WindowStyle = "modal";
             f.Resize = "off";
+            f.Name = "Preferences";
             
             p = uipanel(f);
             y = 2 .* obj.PAD + obj.HEIGHT;

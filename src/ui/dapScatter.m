@@ -66,6 +66,13 @@ classdef dapScatter < handle
             obj.update();
         end
         
+        function varargout = apply(obj, fn)
+            %{
+            fn - function which accepts plot handle and string label
+            %}
+            [varargout{1:nargout}] = fn(obj.plot_handle, obj.legend_display_name);
+        end
+        
         function update(obj)
             assert(~isempty(obj.plot_handle));
             

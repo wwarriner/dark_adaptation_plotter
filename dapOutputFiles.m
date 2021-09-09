@@ -14,7 +14,9 @@ classdef dapOutputFiles < handle
             fh = obj.generate_figure();
             fh.Visible = "on";
             
-            % TODO add onclick callback to deal with results
+            menuh = uimenu(fh);
+            menuh.MenuSelectedFcn = @(varargin)obj.ui_run_export_as();
+            menuh.Text = 'Export As...';
         end
         
         function ui_run_export_as(obj)
@@ -42,7 +44,7 @@ classdef dapOutputFiles < handle
     methods (Access = private)
         function fh = generate_figure(obj)
             fh = uifigure();
-            fh.WindowStyle = "modal";
+            fh.MenuBar = "none";
             fh.Resize = "off";
             fh.Name = "Export Preview";
             fh.Color = [1.0 1.0 1.0];

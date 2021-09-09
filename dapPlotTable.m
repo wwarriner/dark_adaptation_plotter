@@ -163,6 +163,7 @@ classdef dapPlotTable < handle
         end
         
         function [color, marker] = next_appearance(obj)
+            % todo extract this
             color = obj.default_colors{obj.appearance_counter + 1};
             markers = obj.build_markers();
             markers = string(markers(:, 2));

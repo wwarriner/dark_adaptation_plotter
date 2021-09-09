@@ -38,8 +38,8 @@ classdef dapPlotTable < handle
         function add(obj, ids)
             %{
             Inputs
-            1. ids - string-like array of ids. Must not contain duplicates. Must
-            not contain duplicates of data already held.
+            1. ids - string-like array of ids. Must not contain duplicates of
+                data already held.
             %}
             assert(length(ids) == length(unique(ids)));
             for id = ids(:).'
@@ -218,4 +218,3 @@ classdef dapPlotTable < handle
         end
     end
 end
-

@@ -22,7 +22,7 @@ classdef dapPlotTable < handle
             eye_emoji = compose("\xD83D\xDC41\xFE0F");
             ui_t.ColumnName = {'ID', eye_emoji, 'Color', 'Marker', 'Size'};
             ui_t.ColumnEditable = [false true false true true];
-            ui_t.ColumnSortable = [true true false false false];
+            ui_t.ColumnSortable = [false false false false false];
             ui_t.ColumnFormat = {'char', 'logical', 'char', available_markers.keys(), 'numeric'};
             
             styles = StyleManager(ui_t);
@@ -45,6 +45,8 @@ classdef dapPlotTable < handle
             for id = ids(:).'
                 assert(~obj.styles.has_style(id));
             end
+            
+            ids = natsort(ids);
             
             % create new data
             count = numel(ids);

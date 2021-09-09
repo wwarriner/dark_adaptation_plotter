@@ -14,10 +14,11 @@ classdef dapInputFiles < handle
             filter = "*.csv";
             title = "Load CSV data";
             default_path = obj.folder;
-            file = uigetfile(filter, title, default_path);
-            if file == 0
+            [name, path] = uigetfile(filter, title, default_path);
+            if name == 0
                 return;
             end
+            file = fullfile(path, name);
             
             d = uiprogressdlg(figure_for_dialogs);
             d.Message = "Loading file...";

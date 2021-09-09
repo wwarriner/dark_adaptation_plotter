@@ -10,6 +10,7 @@ set colors for multiple plots
 
 add feature to let user select columns
 
+
 send matlab install instructions to Cynthia
 
 
@@ -17,5 +18,7 @@ DONE
 natural sorting order
 preferences menu title
 preferences menu always on top, not modal
-remember previous open folder
-previous export folder
+remember previous open folder in current session
+remember previous export folder in current session
+remember previous open folder across sessions
+remember previous export folder in across sessions

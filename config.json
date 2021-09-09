@@ -24,8 +24,8 @@
         "value": "Minutes following photobleach"
       },
       "max": {
-        "default": 50,
-        "value": 50
+        "default": 20,
+        "value": 20
       },
       "min": {
         "default": 0,

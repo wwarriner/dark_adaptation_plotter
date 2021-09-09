@@ -6,7 +6,11 @@ classdef dapOutputFiles < handle
     end
     
     methods
-        function obj = dapOutputFiles(dap_axes)
+        function obj = dapOutputFiles(config, dap_axes)
+            obj.folder = config.files.output_folder.value;
+            
+            obj.config = config;
+            
             obj.dap_axes = dap_axes;
         end
         
@@ -42,6 +46,8 @@ classdef dapOutputFiles < handle
                 return;
             end
             obj.folder = string(path);
+            obj.config.files.output_folder.value = obj.folder;
+            obj.config.save();
             obj.file_name = string(name);
             file = fullfile(path, name);
             
@@ -52,6 +58,8 @@ classdef dapOutputFiles < handle
     end
     
     properties (Access = private)
+        config Config
+        
         dap_axes dapAxes
     end
     

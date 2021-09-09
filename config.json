@@ -63,6 +63,14 @@
       }
     }
   },
+  "files": {
+    "input_folder": {
+      "value": ""
+    },
+    "output_folder": {
+      "value": ""
+    }
+  },
   "plot": {
     "arrow": {
       "head_size_pt": {

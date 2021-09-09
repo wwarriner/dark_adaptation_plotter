@@ -37,7 +37,7 @@ classdef dapPreferences < handle
             H = 300;
             y = y - H;
             f.Position = [x y W H];
-            f.WindowStyle = "modal";
+            f.WindowStyle = "alwaysontop";
             f.Resize = "off";
             f.Name = "Preferences";
             

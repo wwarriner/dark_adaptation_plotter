@@ -1,6 +1,25 @@
 classdef dapData < handle
+    %{
+    Dev Notes:
+    The intent of this class is to facilitate interfacing with the data. It
+    features a means to normalize various column names from different or
+    inconsistent file sources into a unified, canonical set of variable names.
+    
+    The data is ultimately stored in a map container keyed to the ID column.
+    While data could be stored in a table, we wanted a way to enforce uniqueness
+    of ids.
+    %}
+    
     properties (SetAccess = private)
         ids (:,1) string
+    end
+    
+    properties (Constant)
+        % REQUIRED COLUMNS
+        ID = "id"
+        RECOVERY_TIME = "recovery_time"
+        TIME = "time"
+        SENSITIVITY = "sensitivity"
     end
     
     methods
@@ -9,51 +28,88 @@ classdef dapData < handle
         end
         
         function clear(obj)
+            %{
+            Clears contents, resets to original state.
+            %}
             obj.patients = containers.Map("keytype", "char", "valuetype", "any");
         end
         
         function load(obj, file_path)
             %{
             Overwrites data for existing IDs.
+            
+            Inputs:
+            1. file_path - Path to CSV formatted file
             %}
             t = readtable(file_path);
-            % TODO mangle t.Properties.VariableNames
-            % TODO check mangled t.Properties.VariableNames against canonical
+            obj.add_data(t);
+        end
+        
+        function add_data(obj, t)
+            %{
+            Adds tabular data, keyed to ID column. Overwrites existing data if
+            there is a collision.
+            
+            Inputs:
+            1. t - Table with at least the columns in % REQUIRED COLUMNS
+            %}
+            
+            t = obj.prepare_table(t);
             sorted_names = sort(t.Properties.VariableNames);
             t = t(:, sorted_names);
-            t.PPT_ID = string(t.PPT_ID);
+            t.(obj.ID) = string(t.(obj.ID));
             
-            pt_ids = unique(t.PPT_ID);
-            %pt_ids = natsort(pt_ids); % https://www.mathworks.com/matlabcentral/fileexchange/47434-natural-order-filename-sort
+            pt_ids = unique(t.(obj.ID));
             for i = 1 : numel(pt_ids)
                 id = pt_ids(i);
-                subset = t(t.PPT_ID == id, :);
-                recovery_time = unique(subset.RIT);
-                % TODO handle non-uniform RIT
-                
+                rows = t.(obj.ID) == id;
+                subset = t(rows, :);
+                recovery_time = unique(subset.(obj.RECOVERY_TIME));
+                if 1 < numel(recovery_time)
+                    warning(...
+                        "dapData:ambiguousRecoveryTimeWarning", ...
+                        "more than one unique recovery time found for id %s, skipping", ...
+                        id ...
+                        );
+                    continue;
+                end
                 dp = dapPatient( ...
                     id, ...
                     recovery_time, ...
-                    subset.threshold_time_minutes1, ...
-                    subset.threshold_value1 ...
+                    subset.(obj.TIME), ...
+                    subset.(obj.SENSITIVITY) ...
                     );
                 obj.patients(char(id)) = dp;
             end
         end
         
         function value = has(obj, id)
+            %{
+            Checks for the presence of ID given by id.
+            %}
             value = obj.patients.isKey(char(id));
         end
         
         function value = get(obj, id)
+            %{
+            Returns the dapPatient object associated with ID given by id.
+            %}
             assert(obj.has(id));
             
             value = obj.patients(char(id));
         end
         
         function [patients, ids] = get_all_except(obj, ids)
-            all_ids = string(obj.patients.keys());
-            all_except_ids = setdiff(all_ids, ids);
+            %{
+            Returns all dapPatient objects except those associated with ids.
+            Also returns list of ids.
+            
+            Output:
+            1. patients - cell vector of dapPatient objects
+            2. ids - string vector of ids assoicated with patient objects, of
+            the same length as patients
+            %}
+            all_except_ids = setdiff(obj.ids, ids);
             count = numel(all_except_ids);
             patients = cell(count, 1);
             for i = 1 : count
@@ -68,7 +124,7 @@ classdef dapData < handle
             obj.patients.remove(char(id));
         end
     end
-
+    
     methods % properties
         function ids = get.ids(obj)
             ids = string(obj.patients.keys());
@@ -76,7 +132,60 @@ classdef dapData < handle
     end
     
     properties (Access = private)
-        patients containers.Map
+        patients containers.Map %#ok<MCHDT>
+    end
+    
+    methods (Access = private)
+        function t = prepare_table(~, t)
+            names = [...
+                dapData.ID ...
+                dapData.RECOVERY_TIME ...
+                dapData.TIME ...
+                dapData.SENSITIVITY ...
+                ];
+            variants = {...
+                [] ...
+                "rit" ...
+                "threshold_time" ...
+                ["value", "threshold_value"]
+                };
+            allowed_cols = dapDataColumns(names, variants);
+            cols = t.Properties.VariableNames;
+            [cols, missed] = allowed_cols.normalize(string(cols));
+            if ~isempty(missed)
+                error(...
+                    "dapData:missingColumnsError", ...
+                    "missing columns:" + newline + strjoin(missed, newline) ...
+                    );
+            end
+            t.Properties.VariableNames = cols;
+        end
+        
+        function new_cols = interpret_columns(obj, cols)
+            %{
+            Looking for variations of the columns needed under
+            % REQUIRED COLUMNS
+            
+            For each input column, matches against known columns.
+            If match is found, replace input with known, remove it from list of
+            known, move to the next input.
+            %}
+            assert(isstring(cols));
+            req_cols = obj.REQUIRED_COLUMNS;
+            new_cols = cols;
+            for i = 1 : numel(cols)
+                col = cols(i);
+                col = obj.mangle(col);
+                for j = 1 : numel(req_cols)
+                    req_col = req_cols{j};
+                    if req_col.check(col)
+                        new_cols(i) = req_col.name;
+                        req_cols(j) = [];
+                        break;
+                    end
+                end
+            end
+        end
     end
 end
 

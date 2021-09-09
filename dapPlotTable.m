@@ -9,6 +9,9 @@ classdef dapPlotTable < handle
         VISIBLE_COL = 2;
         COLOR_COL = 3;
         MARKER_COL = 4;
+        SIZE_COL = 5;
+        
+        WIDTH_WEIGHTS = [96 32 48 60 32];
     end
     
     methods
@@ -17,11 +20,10 @@ classdef dapPlotTable < handle
             default_colors = obj.build_default_colors();
             
             eye_emoji = compose("\xD83D\xDC41\xFE0F");
-            ui_t.ColumnName = {'ID', eye_emoji, 'Color', 'Marker'};
-            ui_t.ColumnWidth = {80 48 50 60};
-            ui_t.ColumnEditable = [false true false true];
-            ui_t.ColumnSortable = [true true false false];
-            ui_t.ColumnFormat = {'char', 'logical', 'char', available_markers.keys()};
+            ui_t.ColumnName = {'ID', eye_emoji, 'Color', 'Marker', 'Size'};
+            ui_t.ColumnEditable = [false true false true true];
+            ui_t.ColumnSortable = [false false false false false];
+            ui_t.ColumnFormat = {'char', 'logical', 'char', available_markers.keys(), 'numeric'};
             
             styles = StyleManager(ui_t);
             rows = containers.Map("keytype", "char", "valuetype", "double");
@@ -36,17 +38,19 @@ classdef dapPlotTable < handle
         function add(obj, ids)
             %{
             Inputs
-            1. ids - string-like array of ids. Must not contain duplicates. Must
-            not contain duplicates of data already held.
+            1. ids - string-like array of ids. Must not contain duplicates of
+                data already held.
             %}
             assert(length(ids) == length(unique(ids)));
             for id = ids(:).'
                 assert(~obj.styles.has_style(id));
             end
             
+            ids = natsort(ids);
+            
             % create new data
             count = numel(ids);
-            new_data = cell(count, 4);
+            new_data = cell(count, 5);
             new_style = cell(count, 1);
             i = 0;
             for id = ids(:).'
@@ -108,6 +112,10 @@ classdef dapPlotTable < handle
             display_marker = obj.ui_t.Data{row, obj.MARKER_COL};
             marker = string(obj.available_markers(display_marker));
         end
+        
+        function size = get_size(obj, row)
+            size = obj.ui_t.Data{row, obj.SIZE_COL};
+        end
     end
     
     methods % properties
@@ -141,11 +149,12 @@ classdef dapPlotTable < handle
         
         function row = build_new_row(obj, id, marker)
             % add new row to table
-            row = cell(1, 4);
+            row = cell(1, 5);
             row{obj.ID_COL} = char(id);
             row{obj.VISIBLE_COL} = false;
             row{obj.COLOR_COL} = '';
             row{obj.MARKER_COL} = char(marker);
+            row{obj.SIZE_COL} = 8;
         end
         
         function style = build_new_style(~, color)
@@ -153,20 +162,8 @@ classdef dapPlotTable < handle
             style.BackgroundColor = color.rgb;
         end
         
-        function create_new_row(obj, id)
-            obj.ui_t.Data = [obj.ui_t.Data; new_row];
-            row_index = size(obj.ui_t.Data, 1);
-            
-            % add color style
-            style = uistyle("backgroundcolor", color.rgb);
-            addStyle(obj.ui_t, style, "cell", [row_index obj.COLOR_COL]);
-            obj.styles(id) = style;
-            
-            % add row
-            obj.rows(id) = row_index;
-        end
-        
         function [color, marker] = next_appearance(obj)
+            % todo extract this
             color = obj.default_colors{obj.appearance_counter + 1};
             markers = obj.build_markers();
             markers = string(markers(:, 2));
@@ -222,4 +219,3 @@ classdef dapPlotTable < handle
         end
     end
 end
-

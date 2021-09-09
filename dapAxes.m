@@ -77,6 +77,20 @@ classdef dapAxes < handle
             [varargout{1:nargout}] = draw_fn(obj.axes_handle);
         end
         
+        function add_to_legend(obj, handle, label)
+            label = string(label);
+            obj.legend_plot_handles = [obj.legend_plot_handles handle];
+            obj.legend_plot_labels = [obj.legend_plot_labels label];
+            obj.update_legend();
+        end
+        
+        function remove_from_legend(obj, handle, ~)
+            index = obj.legend_plot_handles == handle;
+            obj.legend_plot_handles(index) = [];
+            obj.legend_plot_labels(index) = [];
+            obj.update_legend();
+        end
+        
         function register_callback(obj, tag, fn)
             obj.callbacks(char(tag)) = fn;
         end
@@ -96,6 +110,9 @@ classdef dapAxes < handle
         layout_handle matlab.graphics.layout.TiledChartLayout
         axes_handle matlab.graphics.Graphics
         legend_handle matlab.graphics.illustration.Legend
+        
+        legend_plot_handles matlab.graphics.Graphics
+        legend_plot_labels string
         
         callbacks containers.Map
     end
@@ -133,7 +150,14 @@ classdef dapAxes < handle
             h.Layout.TileSpan = obj.LEGEND_TILE_SPAN;
             h.Layout.Tile = obj.LEGEND_TILE;
             h.Units = "pixels";
+            h.Interpreter = "none";
+            h.AutoUpdate = "off";
             legend_handle = h;
+        end
+        
+        function update_legend(obj)
+            legend(obj.axes_handle, obj.legend_plot_handles);
+            obj.legend_handle.String = obj.legend_plot_labels;
         end
         
         function v = get_x_value(obj, key)

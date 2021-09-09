@@ -4,7 +4,11 @@ classdef dapInputFiles < handle
     end
     
     methods
-        function obj = dapInputFiles(dap_data, dap_table, dap_plots)
+        function obj = dapInputFiles(config, dap_data, dap_table, dap_plots)
+            obj.folder = config.files.input_folder.value;
+            
+            obj.config = config;
+            
             obj.dap_data = dap_data;
             obj.dap_table = dap_table;
             obj.dap_plots = dap_plots;
@@ -19,6 +23,8 @@ classdef dapInputFiles < handle
                 return;
             end
             obj.folder = string(path);
+            obj.config.files.input_folder.value = obj.folder;
+            obj.config.save();
             file = fullfile(path, name);
             
             d = uiprogressdlg(figure_for_dialogs);
@@ -37,6 +43,8 @@ classdef dapInputFiles < handle
     end
     
     properties (Access = private)
+        config Config
+        
         dap_data dapData
         dap_table dapPlotTable
         dap_plots dapPlots

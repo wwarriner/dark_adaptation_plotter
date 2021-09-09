@@ -162,19 +162,6 @@ classdef dapPlotTable < handle
             style.BackgroundColor = color.rgb;
         end
         
-        function create_new_row(obj, id)
-            obj.ui_t.Data = [obj.ui_t.Data; new_row];
-            row_index = size(obj.ui_t.Data, 1);
-            
-            % add color style
-            style = uistyle("backgroundcolor", color.rgb);
-            addStyle(obj.ui_t, style, "cell", [row_index obj.COLOR_COL]);
-            obj.styles(id) = style;
-            
-            % add row
-            obj.rows(id) = row_index;
-        end
-        
         function [color, marker] = next_appearance(obj)
             color = obj.default_colors{obj.appearance_counter + 1};
             markers = obj.build_markers();

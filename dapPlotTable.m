@@ -38,8 +38,8 @@ classdef dapPlotTable < handle
         function add(obj, ids)
             %{
             Inputs
-            1. ids - string-like array of ids. Must not contain duplicates. Must
-            not contain duplicates of data already held.
+            1. ids - string-like array of ids. Must not contain duplicates of
+                data already held.
             %}
             assert(length(ids) == length(unique(ids)));
             for id = ids(:).'
@@ -162,20 +162,8 @@ classdef dapPlotTable < handle
             style.BackgroundColor = color.rgb;
         end
         
-        function create_new_row(obj, id)
-            obj.ui_t.Data = [obj.ui_t.Data; new_row];
-            row_index = size(obj.ui_t.Data, 1);
-            
-            % add color style
-            style = uistyle("backgroundcolor", color.rgb);
-            addStyle(obj.ui_t, style, "cell", [row_index obj.COLOR_COL]);
-            obj.styles(id) = style;
-            
-            % add row
-            obj.rows(id) = row_index;
-        end
-        
         function [color, marker] = next_appearance(obj)
+            % todo extract this
             color = obj.default_colors{obj.appearance_counter + 1};
             markers = obj.build_markers();
             markers = string(markers(:, 2));
@@ -231,4 +219,3 @@ classdef dapPlotTable < handle
         end
     end
 end
-

@@ -2,13 +2,9 @@ uniform change to marker size
 
 add reset to default button for each field in preferences
 
-add export button to "export preview"
-
 add column for class/category
 add groups based on pt class?
 set colors for multiple plots
-
-add feature to let user select columns
 
 
 send matlab install instructions to Cynthia
@@ -18,7 +14,9 @@ DONE
 natural sorting order
 preferences menu title
 preferences menu always on top, not modal
+add export button to "export preview"
 remember previous open folder in current session
 remember previous export folder in current session
 remember previous open folder across sessions
 remember previous export folder in across sessions
+let user select columns

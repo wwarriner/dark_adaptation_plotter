@@ -102,5 +102,13 @@
       "default": 3,
       "value": 3
     }
+  },
+  "table_field_selection": {
+    "metanames": {
+      "id": "Patient ID",
+      "recovery_time": "Rod Intercept Time (min)",
+      "sensitivity": "Log Sensitivity (dB)",
+      "time": "Minutes Since Photobleach"
+    }
   }
 }

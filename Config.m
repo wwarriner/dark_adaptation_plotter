@@ -95,7 +95,7 @@ classdef Config < DynamicPropertyTree
         function write(obj, file)
             assert(isstring(file));
             
-            s = obj.struct();
+            s = obj.to_struct();
             write_json_file(file, s);
         end
     end

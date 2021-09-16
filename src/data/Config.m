@@ -5,10 +5,6 @@ classdef Config < DynamicPropertyTree
     value = config("a.b.c");
     %}
     
-    properties (Access = private)
-        file (1,1) string
-    end
-    
     methods
         function obj = Config(file)
             if nargin == 0
@@ -27,7 +23,7 @@ classdef Config < DynamicPropertyTree
             s = read_json_file(file);
             obj.build(s, string(mfilename('class')));
             
-            obj.file = file;
+            obj.file___ = file;
         end
         
         function apply_to(obj, other_obj, silent)
@@ -56,8 +52,8 @@ classdef Config < DynamicPropertyTree
             switch s(1).type
                 case "."
                     if numel(s) == 1
-                        if s(1).subs == "file"
-                            varargout{1} = obj.file;
+                        if s(1).subs == "file___"
+                            varargout{1} = obj.file___;
                         else
                             [varargout{1:nargout}] = obj.subsref@DynamicPropertyTree(s);
                         end
@@ -79,8 +75,8 @@ classdef Config < DynamicPropertyTree
             switch s(1).type
                 case "."
                     if numel(s) == 1
-                        if s(1).subs == "file"
-                            obj.file = varargin{1};
+                        if s(1).subs == "file___"
+                            obj.file___ = varargin{1};
                         else
                             obj.subsasgn@DynamicPropertyTree(s, varargin{:});
                         end
@@ -98,8 +94,14 @@ classdef Config < DynamicPropertyTree
             end  
         end
         
+        function reload(obj)
+            obj.clear();
+            obj.make_mutable();
+            obj.read(obj.file___);
+        end
+        
         function save(obj)
-            obj.write(obj.file);
+            obj.write(obj.file___);
         end
         
         function write(obj, file)
@@ -108,5 +110,9 @@ classdef Config < DynamicPropertyTree
             s = obj.to_struct();
             write_json_file(file, s);
         end
+    end
+    
+    properties (Access = private)
+        file___ (1,1) string
     end
 end

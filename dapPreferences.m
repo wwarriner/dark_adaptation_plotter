@@ -12,6 +12,7 @@ classdef dapPreferences < handle
         end
         
         function ui_update_font(obj)
+            % creates font dialog and updates config with user selection
             f = obj.config.axes.font;
             s.FontName = f.name.value;
             s.FontSize = f.size.value;
@@ -31,6 +32,7 @@ classdef dapPreferences < handle
         function ui_update_preferences(obj, x, y)
             old_config = obj.config.copy();
             
+            % PREPARE FIGURE
             f = uifigure();
             f.Scrollable = "on";
             W = 440;
@@ -41,6 +43,7 @@ classdef dapPreferences < handle
             f.Resize = "off";
             f.Name = "Preferences";
             
+            % CREATE SCROLLABLE PANEL
             p = uipanel(f);
             y = 2 .* obj.PAD + obj.HEIGHT;
             w = f.Position(3);
@@ -48,69 +51,28 @@ classdef dapPreferences < handle
             p.Position = [1 y w h];
             total_height = p.Position(4);
             
-            index = 0;
-            fields = prefField.empty();
+            % CREATE PREF FIELDS
+            pref_declarations = read_json_file("prefs.json");
+            pref_keys = fieldnames(pref_declarations);
+            pref_count = numel(pref_keys);
             
-            index = index + 1;
-            label_pos = dapPreferences.index_to_label_position(total_height, index);
-            ui_pos = dapPreferences.index_to_ui_position(total_height, index);
-            x_title = prefField(p, obj.config.axes.x.label, @uieditfield, @obj.push_update);
-            x_title.label.Position = label_pos;
-            x_title.label.Text = "X axis title";
-            x_title.ui.Position = ui_pos;
-            x_title.update_from_config();
-            fields(index) = x_title;
+            fields = prefField.empty(pref_count, 0);
+            for index = 1 : pref_count
+                pref_decl = pref_declarations.(pref_keys{index});
+                pf = prefField(p, pref_decl, obj.config, @obj.push_update);
+                pf.label.Position = dapPreferences.index_to_label_position(total_height, index);
+                pf.ui.Position = dapPreferences.index_to_ui_position(total_height, index);
+                pf.update_from_config();
+                fields(index) = pf;
+            end
             
-            index = index + 1;
-            label_pos = dapPreferences.index_to_label_position(total_height, index);
-            ui_pos = dapPreferences.index_to_ui_position(total_height, index);
-            x_max = prefField(p, obj.config.axes.x.max, @uispinner, @obj.push_update);
-            x_max.label.Text = "X axis maximum";
-            x_max.label.Position = label_pos;
-            x_max.ui.Value = obj.config.axes.x.max.value;
-            x_max.ui.Limits = [obj.config.axes.x.min.value inf];
-            x_max.ui.Step = obj.config.axes.x.step.value;
-            x_max.ui.RoundFractionalValues = "on";
-            x_max.ui.ValueDisplayFormat = "%d";
-            x_max.ui.LowerLimitInclusive = "off";
-            x_max.ui.UpperLimitInclusive = "off";
-            x_max.ui.Position = ui_pos;
-            x_max.update_from_config();
-            fields(index) = x_max;
-            
-            index = index + 1;
-            label_pos = dapPreferences.index_to_label_position(total_height, index);
-            ui_pos = dapPreferences.index_to_ui_position(total_height, index);
-            y_title = prefField(p, obj.config.axes.y.label, @uieditfield, @obj.push_update);
-            y_title.label.Text = "Y axis title";
-            y_title.label.Position = label_pos;
-            y_title.ui.Value = obj.config.axes.y.label.value;
-            y_title.ui.Position = ui_pos;
-            y_title.update_from_config();
-            fields(index) = y_title;
-            
-            index = index + 1;
-            label_pos = dapPreferences.index_to_label_position(total_height, index);
-            ui_pos = dapPreferences.index_to_ui_position(total_height, index);
-            y_max = prefField(p, obj.config.axes.y.max, @uispinner, @obj.push_update);
-            y_max.label.Text = "Y axis maximum";
-            y_max.label.Position = label_pos;
-            y_max.ui.Value = obj.config.axes.y.max.value;
-            y_max.ui.Limits = [obj.config.axes.y.min.value inf];
-            y_max.ui.Step = obj.config.axes.y.step.value;
-            y_max.ui.RoundFractionalValues = "off";
-            y_max.ui.ValueDisplayFormat = "%.1f";
-            y_max.ui.LowerLimitInclusive = "off";
-            y_max.ui.UpperLimitInclusive = "off";
-            y_max.ui.Position = ui_pos;
-            y_max.update_from_config();
-            fields(index) = y_max;
-            
+            % RESET BUTTON
             reset = uibutton(f);
             reset.Text = "Reset to Default";
             reset.Position = [obj.PAD, obj.PAD, obj.W_LEFT_BUTTON, obj.HEIGHT];
             reset.ButtonPushedFcn = @(~, ~)obj.reset_to_default_callback_fn(fields);
             
+            % ACCEPT BUTTON
             count = 2;
             x = count .* obj.PAD + count .* obj.W_RIGHT_BUTTON;
             x = f.Position(3) - x;
@@ -119,6 +81,7 @@ classdef dapPreferences < handle
             accept.Position = [x, obj.PAD, obj.W_RIGHT_BUTTON, obj.HEIGHT];
             accept.ButtonPushedFcn = @(~, ~)obj.accept_callback_fn(f);
             
+            % CANCEL BUTTON
             w = obj.W_RIGHT_BUTTON;
             x = x + obj.PAD + obj.W_RIGHT_BUTTON;
             cancel = uibutton(f);
@@ -126,6 +89,7 @@ classdef dapPreferences < handle
             cancel.Position = [x, obj.PAD, w, obj.HEIGHT];
             cancel.ButtonPushedFcn = @(~, ~)obj.cancel_callback_fn(old_config, f);
             
+            % WAIT FOR USER TO FINISH
             uiwait(f);
         end
     end

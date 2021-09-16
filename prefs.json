@@ -1,0 +1,42 @@
+{
+  "x_axis_title": {
+    "object": "uieditfield",
+    "config": "axes.x.label",
+    "label": { "Text": "X axis title" },
+    "ui": {}
+  },
+  "x_max": {
+    "object": "uispinner",
+    "config": "axes.x.max",
+    "label": { "Text": "X axis maximum" },
+    "ui": {
+      "Value": { "config": "axes.x.max.value" },
+      "Limits": [{ "config": "axes.x.min.value" }, { "float": "inf" }],
+      "Step": { "config": "axes.x.step.value" },
+      "RoundFractionalValues": true,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "y_axis_title": {
+    "object": "uieditfield",
+    "config": "axes.y.label",
+    "label": { "Text": "Y axis title" },
+    "ui": {}
+  },
+  "y_max": {
+    "object": "uispinner",
+    "config": "axes.y.max",
+    "label": { "Text": "Y axis maximum" },
+    "ui": {
+      "Value": { "config": "axes.y.max.value" },
+      "Limits": [{ "config": "axes.y.min.value" }, { "float": "inf" }],
+      "Step": { "config": "axes.y.step.value" },
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  }
+}

@@ -1,6 +1,6 @@
 classdef dapPreferences < handle
     methods
-        function obj = dapPreferences(config, size_px)
+        function obj = dapPreferences(config, size_px, prefs_file)
             if nargin < 2
                 size_px = [440 300];
             end
@@ -11,6 +11,7 @@ classdef dapPreferences < handle
             
             obj.config = config;
             obj.size_px = size_px;
+            obj.prefs_file = prefs_file;
             obj.callbacks = callbacks;
         end
         
@@ -51,6 +52,7 @@ classdef dapPreferences < handle
     properties (Access = private)
         config Config
         size_px(1,2) double {mustBeReal,mustBeFinite,mustBeNonnegative}
+        prefs_file(1,1) string
         callbacks containers.Map
     end
     
@@ -122,7 +124,7 @@ classdef dapPreferences < handle
         end
         
         function fields = add_pref_fields(obj, parent)
-            pref_declarations = read_json_file("res/prefs.json");
+            pref_declarations = read_json_file(obj.prefs_file);
             pref_keys = fieldnames(pref_declarations);
             pref_count = numel(pref_keys);
             

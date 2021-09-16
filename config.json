@@ -24,8 +24,8 @@
         "value": "Minutes following photobleach"
       },
       "max": {
-        "default": 50,
-        "value": 50
+        "default": 20,
+        "value": 20
       },
       "min": {
         "default": 0,
@@ -63,6 +63,14 @@
       }
     }
   },
+  "files": {
+    "input_folder": {
+      "value": ""
+    },
+    "output_folder": {
+      "value": ""
+    }
+  },
   "plot": {
     "arrow": {
       "head_size_pt": {
@@ -93,6 +101,14 @@
     "y": {
       "default": 3,
       "value": 3
+    }
+  },
+  "table_field_selection": {
+    "metanames": {
+      "id": "Patient ID",
+      "recovery_time": "Rod Intercept Time (min)",
+      "sensitivity": "Log Sensitivity (dB)",
+      "time": "Minutes Since Photobleach"
     }
   }
 }

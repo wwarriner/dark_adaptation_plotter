@@ -14,7 +14,22 @@ classdef DynamicPropertyTree < dynamicprops ...
             end
         end
         
-        function s = struct(obj)
+        function m = to_map(obj)
+            fields = string(fieldnames(obj));
+            child_count = numel(fields);
+            values = cell(child_count, 1);
+            for i = 1 : child_count
+                key = fields(i);
+                value = obj.(key);
+                if isobject(value) && ~isstring(value)
+                    value = value.to_map();
+                end
+                values{i} = value;
+            end
+            m = containers.Map(fields, values);
+        end
+        
+        function s = to_struct(obj)
             s = struct();
             fields = string(fieldnames(obj));
             child_count = numel(fields);
@@ -22,7 +37,7 @@ classdef DynamicPropertyTree < dynamicprops ...
                 key = fields(i);
                 value = obj.(key);
                 if isobject(value) && ~isstring(value)
-                    value = value.struct();
+                    value = value.to_struct();
                 end
                 s.(key) = value;
             end

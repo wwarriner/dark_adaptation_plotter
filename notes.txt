@@ -9,4 +9,6 @@ add reset to default button for each field in preferences
 set colors for multiple plots
 marker edge color
 
-
+[[open source]]
+extract dapPreferences and prefField and prefs.json into sep repo
+extract config also

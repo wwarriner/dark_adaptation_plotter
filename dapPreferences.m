@@ -109,14 +109,20 @@ classdef dapPreferences < handle
             w = parent.Position(3);
             h = parent.Position(4) - y + 1;
             p.Position = [1 y w h];
+            p.Scrollable = true;
         end
         
         function fields = add_pref_fields(obj, parent)
-            total_height = parent.Position(4);
-            
             pref_declarations = read_json_file("prefs.json");
             pref_keys = fieldnames(pref_declarations);
             pref_count = numel(pref_keys);
+            
+            total_height = obj.total_height(pref_count);
+            
+            % HACK - empty uilabel because scrollability doesn't respect the top pad
+            uih = uilabel(parent);
+            uih.Position(2) = obj.index_to_y(total_height, 1) + obj.PAD;
+            uih.Text = "";
             
             fields = prefField.empty(pref_count, 0);
             for index = 1 : pref_count
@@ -167,7 +173,11 @@ classdef dapPreferences < handle
         end
         
         function y = index_to_y(total_height, index)
-            y = total_height - (dapPreferences.BUTTON_H .* index + dapPreferences.PAD .* index);
+            y = total_height - (dapPreferences.BUTTON_H .* index + dapPreferences.PAD .* (index + 1));
+        end
+        
+        function h = total_height(count)
+            h = (dapPreferences.BUTTON_H .* count) + (dapPreferences.PAD * (count + 2));
         end
     end
 end

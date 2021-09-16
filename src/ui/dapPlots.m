@@ -55,13 +55,18 @@ classdef dapPlots < handle
             assert(islogical(visible));
             
             plot = obj.plots(id);
+            previously_visible = plot.visible;
             plot.visible = visible;
             plot.update();
             
-            if visible
+            if visible && ~previously_visible
                 plot.apply(@(varargin)obj.dap_axes.add_to_legend(varargin{:}));
-            else
+            elseif ~visible && previously_visible
                 plot.apply(@(varargin)obj.dap_axes.remove_from_legend(varargin{:}));
+            else
+                % (visible && previously_visible)
+                % || (~visible && ~previously_visible)
+                % noop
             end
         end
         

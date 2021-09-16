@@ -15,6 +15,12 @@ classdef dapInputFiles < handle
         end
         
         function ui_open_file(obj, figure_for_dialogs)
+            d = uiprogressdlg(figure_for_dialogs);
+            d.Message = "Loading file...";
+            d.Title = "Loading";
+            d.Indeterminate = true;
+            closer = onCleanup(@()d.close());
+            
             filter = "*.csv";
             title = "Load CSV data";
             default_folder = obj.folder;
@@ -27,14 +33,15 @@ classdef dapInputFiles < handle
             obj.config.save();
             file = fullfile(path, name);
             
-            d = uiprogressdlg(figure_for_dialogs);
-            d.Message = "Loading file...";
-            d.Title = "Loading";
-            d.Indeterminate = true;
+            t = readtable(file);
+            metaname_map = obj.config.table_field_selection.metanames.to_map();
+            tfs_config.metanames = metaname_map.values();
+            c = select_table_fields(tfs_config, t);
+            t = renamevars(t, c.values(), c.keys());
+            t = renamevars(t, metaname_map.values(), metaname_map.keys());
+            t = t(:, metaname_map.keys());
             
-            closer = onCleanup(@()d.close());
-            
-            obj.dap_data.load(file);
+            obj.dap_data.add_data(t);
             existing_ids = obj.dap_table.ids; % TODO check plots
             [patients, ids] = obj.dap_data.get_all_except(existing_ids);
             obj.dap_table.add(ids);

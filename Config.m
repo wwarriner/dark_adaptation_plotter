@@ -1,4 +1,10 @@
 classdef Config < DynamicPropertyTree
+    %{
+    config = Config("config.json");
+    config.a.b.c = "value";
+    value = config("a.b.c");
+    %}
+    
     properties (Access = private)
         file (1,1) string
     end
@@ -59,7 +65,9 @@ classdef Config < DynamicPropertyTree
                         [varargout{1:nargout}] = builtin("subsref", obj, s);
                     end
                 case "()"
-                    [varargout{1:nargout}] = builtin("subsref", obj, s);
+                    [token, remain] = strtok(s, ".");
+                    child = builtin("subsasgn", obj, token);
+                    [varargout{1:nargout}] = builtin("subsasgn", child, remain);
                 case "{}"
                     [varargout{1:nargout}] = builtin("subsref", obj, s);
                 otherwise
@@ -80,7 +88,9 @@ classdef Config < DynamicPropertyTree
                         obj = builtin("subsasgn", obj, s, varargin{:});
                     end
                 case "()"
-                    obj = builtin("subsasgn", obj, s, varargin{:});
+                    [token, remain] = strtok(s, ".");
+                    child = builtin("subsasgn", obj, token);
+                    obj = builtin("subsasgn", child, remain, varargin{:});
                 case "{}"
                     obj = builtin("subsasgn", obj, s, varargin{:});
                 otherwise
@@ -95,7 +105,7 @@ classdef Config < DynamicPropertyTree
         function write(obj, file)
             assert(isstring(file));
             
-            s = obj.struct();
+            s = obj.to_struct();
             write_json_file(file, s);
         end
     end

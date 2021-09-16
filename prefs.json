@@ -1,4 +1,32 @@
 {
+  "arrow_head_size_pt": {
+    "object": "uispinner",
+    "config": "plot.arrow.head_size_pt",
+    "label": { "Text": "Arrow head size (pt)" },
+    "ui": {
+      "Value": { "config": "plot.arrow.head_size_pt.value" },
+      "Limits": [1, 72],
+      "Step": 1,
+      "RoundFractionalValues": true,
+      "ValueDisplayFormat": "%d",
+      "LowerLimitInclusive": true,
+      "UpperLimitInclusive": true
+    }
+  },
+  "arrow_line_width_pt": {
+    "object": "uispinner",
+    "config": "plot.arrow.line_width_pt",
+    "label": { "Text": "Arrow line width (pt)" },
+    "ui": {
+      "Value": { "config": "plot.arrow.line_width_pt.value" },
+      "Limits": [0.5, 6],
+      "Step": 0.5,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.1f",
+      "LowerLimitInclusive": true,
+      "UpperLimitInclusive": true
+    }
+  },
   "legend_location": {
     "object": "uidropdown",
     "config": "axes.legend.location",

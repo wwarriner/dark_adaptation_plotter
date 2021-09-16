@@ -51,7 +51,9 @@
     "object": "uieditfield",
     "config": "axes.x.label",
     "label": { "Text": "X axis title" },
-    "ui": {}
+    "ui": {
+      "Value": { "config": "axes.x.label.value" }
+    }
   },
   "x_max": {
     "object": "uispinner",
@@ -71,7 +73,9 @@
     "object": "uieditfield",
     "config": "axes.y.label",
     "label": { "Text": "Y axis title" },
-    "ui": {}
+    "ui": {
+      "Value": { "config": "axes.y.label.value" }
+    }
   },
   "y_min": {
     "object": "uispinner",

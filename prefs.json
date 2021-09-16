@@ -69,6 +69,34 @@
       "UpperLimitInclusive": false
     }
   },
+  "x_major_tick": {
+    "object": "uispinner",
+    "config": "axes.x.step",
+    "label": { "Text": "X axis major tick" },
+    "ui": {
+      "Value": { "config": "axes.x.step.value" },
+      "Limits": [0, { "float": "inf" }],
+      "Step": 0.5,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "x_minor_tick": {
+    "object": "uispinner",
+    "config": "axes.x.minor_step",
+    "label": { "Text": "X axis minor tick" },
+    "ui": {
+      "Value": { "config": "axes.x.minor_step.value" },
+      "Limits": [0, { "float": "inf" }],
+      "Step": 0.1,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
   "y_axis_title": {
     "object": "uieditfield",
     "config": "axes.y.label",
@@ -99,6 +127,34 @@
       "Value": { "config": "axes.y.max.value" },
       "Limits": [{ "config": "axes.y.min.value" }, { "float": "inf" }],
       "Step": { "config": "axes.y.step.value" },
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "y_major_tick": {
+    "object": "uispinner",
+    "config": "axes.y.step",
+    "label": { "Text": "Y axis major tick" },
+    "ui": {
+      "Value": { "config": "axes.y.step.value" },
+      "Limits": [0, { "float": "inf" }],
+      "Step": 0.5,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "y_minor_tick": {
+    "object": "uispinner",
+    "config": "axes.y.minor_step",
+    "label": { "Text": "Y axis minor tick" },
+    "ui": {
+      "Value": { "config": "axes.y.minor_step.value" },
+      "Limits": [0, { "float": "inf" }],
+      "Step": 0.1,
       "RoundFractionalValues": false,
       "ValueDisplayFormat": "%.2f",
       "LowerLimitInclusive": false,

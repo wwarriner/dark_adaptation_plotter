@@ -60,12 +60,12 @@
         "value": 0
       },
       "minor_step": {
-        "default": 0.1,
-        "value": 0.1
-      },
-      "step": {
         "default": 0.5,
         "value": 0.5
+      },
+      "step": {
+        "default": 1,
+        "value": 1
       }
     }
   },

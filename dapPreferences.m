@@ -1,9 +1,16 @@
 classdef dapPreferences < handle
     methods
-        function obj = dapPreferences(config)
+        function obj = dapPreferences(config, size_px)
+            if nargin < 2
+                size_px = [440 300];
+            end
+            
+            assert(all(size_px == fix(size_px)));
+            
             callbacks = containers.Map("keytype", "char", "valuetype", "any");
             
             obj.config = config;
+            obj.size_px = size_px;
             obj.callbacks = callbacks;
         end
         
@@ -43,6 +50,7 @@ classdef dapPreferences < handle
     
     properties (Access = private)
         config Config
+        size_px(1,2) double {mustBeReal,mustBeFinite,mustBeNonnegative}
         callbacks containers.Map
     end
     
@@ -50,8 +58,9 @@ classdef dapPreferences < handle
         PAD = 6;
         W_LABEL = 200;
         
-        X_UI = 2.* dapPreferences.PAD + dapPreferences.W_LABEL;
-        W_UI = 200;
+        X_UI = 2 .* dapPreferences.PAD + dapPreferences.W_LABEL;
+        
+        GUTTER_W = 3 .* dapPreferences.PAD;
         
         W_RIGHT_BUTTON = 48;
         W_LEFT_BUTTON = 96;
@@ -93,10 +102,10 @@ classdef dapPreferences < handle
         function f = create_figure(obj, x, y, old_config)
             f = uifigure();
             f.Scrollable = "on";
-            W = 440;
-            H = 300;
-            y = y - H;
-            f.Position = [x y W H];
+            w = obj.size_px(1);
+            h = obj.size_px(2);
+            y = y - h;
+            f.Position = [x y w h];
             f.WindowStyle = "alwaysontop";
             f.Resize = "off";
             f.Name = "Preferences";
@@ -105,7 +114,7 @@ classdef dapPreferences < handle
         
         function p = create_panel(obj, parent)
             p = uipanel(parent);
-            y = 2 .* obj.PAD + obj.BUTTON_H;
+            y = 2 .* obj.PAD + obj.BUTTON_H; % bottom button row
             w = parent.Position(3);
             h = parent.Position(4) - y + 1;
             p.Position = [1 y w h];
@@ -129,7 +138,7 @@ classdef dapPreferences < handle
                 pref_decl = pref_declarations.(pref_keys{index});
                 pf = prefField(parent, pref_decl, obj.config, @obj.push_update);
                 pf.label.Position = obj.index_to_label_position(total_height, index);
-                pf.ui.Position = obj.index_to_ui_position(total_height, index);
+                pf.ui.Position = obj.index_to_ui_position(total_height, obj.size_px(1), index);
                 pf.update_from_config();
                 fields(index) = pf;
             end
@@ -167,9 +176,10 @@ classdef dapPreferences < handle
             pos = [dapPreferences.PAD, y, dapPreferences.W_LABEL, dapPreferences.BUTTON_H];
         end
         
-        function pos = index_to_ui_position(total_height, index)
+        function pos = index_to_ui_position(total_height, width, index)
             y = dapPreferences.index_to_y(total_height, index);
-            pos = [dapPreferences.X_UI, y, dapPreferences.W_UI, dapPreferences.BUTTON_H];
+            w = width - dapPreferences.W_LABEL - (3 .* dapPreferences.PAD) - dapPreferences.GUTTER_W;
+            pos = [dapPreferences.X_UI, y, w, dapPreferences.BUTTON_H];
         end
         
         function y = index_to_y(total_height, index)

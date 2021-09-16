@@ -63,6 +63,8 @@ classdef dapAxes < handle
             h.FontWeight = font_weight;
             h.FontAngle = font_angle;
             
+            obj.legend_handle.Location = obj.config.axes.legend.location.value;
+            
             keys = string(obj.callbacks.keys());
             for i = 1 : numel(keys)
                 fn = obj.callbacks(keys(i));
@@ -81,14 +83,16 @@ classdef dapAxes < handle
             label = string(label);
             obj.legend_plot_handles = [obj.legend_plot_handles handle];
             obj.legend_plot_labels = [obj.legend_plot_labels label];
-            obj.update_legend();
+            obj.update_legend_contents();
+            obj.update();
         end
         
         function remove_from_legend(obj, handle, ~)
             index = obj.legend_plot_handles == handle;
             obj.legend_plot_handles(index) = [];
             obj.legend_plot_labels(index) = [];
-            obj.update_legend();
+            obj.update_legend_contents();
+            obj.update();
         end
         
         function register_callback(obj, tag, fn)
@@ -155,9 +159,18 @@ classdef dapAxes < handle
             legend_handle = h;
         end
         
-        function update_legend(obj)
-            legend(obj.axes_handle, obj.legend_plot_handles);
-            obj.legend_handle.String = obj.legend_plot_labels;
+        function update_legend_contents(obj)
+            obj.legend_handle = legend(obj.axes_handle, obj.legend_plot_handles);
+            if isempty(obj.legend_plot_labels)
+                % HACK need to rebuild the legend to empty it out
+                % setting empty string array has no effect (grays out last entry
+                % instead of removing it)
+                % SUBMIT BUG REPORT TO MATHWORKS
+                legend(obj.axes_handle, "off");
+                obj.legend_handle = obj.build_legend(obj.axes_handle);
+            else
+                obj.legend_handle.String = obj.legend_plot_labels;
+            end
         end
         
         function v = get_x_value(obj, key)

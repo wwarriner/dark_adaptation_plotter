@@ -4,9 +4,10 @@ classdef dapPlots < handle
     end
     
     methods
-        function obj = dapPlots(dap_axes)
+        function obj = dapPlots(config, dap_axes)
             plots = containers.Map("keytype", "char", "valuetype", "any");
             
+            obj.config = config;
             obj.dap_axes = dap_axes;
             obj.plots = plots;
         end
@@ -55,13 +56,18 @@ classdef dapPlots < handle
             assert(islogical(visible));
             
             plot = obj.plots(id);
+            previously_visible = plot.visible;
             plot.visible = visible;
             plot.update();
             
-            if visible
+            if visible && ~previously_visible
                 plot.apply(@(varargin)obj.dap_axes.add_to_legend(varargin{:}));
-            else
+            elseif ~visible && previously_visible
                 plot.apply(@(varargin)obj.dap_axes.remove_from_legend(varargin{:}));
+            else
+                % (visible && previously_visible)
+                % || (~visible && ~previously_visible)
+                % noop
             end
         end
         
@@ -98,6 +104,8 @@ classdef dapPlots < handle
             for i = 1 : numel(current_ids)
                 plot = obj.plots(current_ids(i));
                 if plot.visible
+                    plot.arrow_line_width_pt = obj.config.plot.arrow.line_width_pt.value;
+                    plot.arrow_head_size_pt = obj.config.plot.arrow.head_size_pt.value;
                     plot.update();
                 end
             end
@@ -111,6 +119,7 @@ classdef dapPlots < handle
     end
     
     properties (Access = private)
+        config Config
         dap_axes dapAxes
         plots containers.Map
     end

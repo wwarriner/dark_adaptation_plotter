@@ -34,17 +34,6 @@ classdef dapData < handle
             obj.patients = containers.Map("keytype", "char", "valuetype", "any");
         end
         
-        function load(obj, file_path)
-            %{
-            Overwrites data for existing IDs.
-            
-            Inputs:
-            1. file_path - Path to CSV formatted file
-            %}
-            t = readtable(file_path);
-            obj.add_data(t);
-        end
-        
         function add_data(obj, t)
             %{
             Adds tabular data, keyed to ID column. Overwrites existing data if

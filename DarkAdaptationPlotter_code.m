@@ -120,8 +120,8 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             dt = dapPlotTable(app.Table);
             dp = dapPlots(da);
             
-            dof = dapOutputFiles(da);
-            dif = dapInputFiles(dd, dt, dp);
+            dof = dapOutputFiles(config, da);
+            dif = dapInputFiles(config, dd, dt, dp);
             
             dpref = dapPreferences(config);
             dpref.register_callback("dapAxes", @da.update);
@@ -223,13 +223,13 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         
         % Menu selected function: ExportPreviewMenu
         function ExportPreviewMenuSelected(app, event)
-            app.dap_output_files.ui_run_export_preview();
+            app.dap_output_files.ui_run_export_preview(app.UIFigure);
         end
         
         % Menu selected function: ExportAsMenu
         function ExportAsMenuSelected(app, event)
             assert(~isempty(app.dap_output_files));
-            app.dap_output_files.ui_run_export_as();
+            app.dap_output_files.ui_run_export_as(app.UIFigure);
         end
         
         % Menu selected function: ExitMenu

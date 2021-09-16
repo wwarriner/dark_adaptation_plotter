@@ -157,7 +157,16 @@ classdef dapAxes < handle
         
         function update_legend(obj)
             legend(obj.axes_handle, obj.legend_plot_handles);
-            obj.legend_handle.String = obj.legend_plot_labels;
+            if isempty(obj.legend_plot_labels)
+                % HACK need to rebuild the legend to empty it out
+                % setting empty string array has no effect (grays out last entry
+                % instead of removing it)
+                % SUBMIT BUG REPORT TO MATHWORKS
+                legend(obj.axes_handle, "off");
+                obj.legend_handle = obj.build_legend(obj.axes_handle);
+            else
+                obj.legend_handle.String = obj.legend_plot_labels;
+            end
         end
         
         function v = get_x_value(obj, key)

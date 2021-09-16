@@ -25,6 +25,20 @@
     "label": { "Text": "Y axis title" },
     "ui": {}
   },
+  "y_min": {
+    "object": "uispinner",
+    "config": "axes.y.min",
+    "label": { "Text": "Y axis minimum" },
+    "ui": {
+      "Value": { "config": "axes.y.min.value" },
+      "Limits": [{ "float": "-inf" }, { "config": "axes.y.max.value" }],
+      "Step": { "config": "axes.y.step.value" },
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
   "y_max": {
     "object": "uispinner",
     "config": "axes.y.max",

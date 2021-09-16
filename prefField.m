@@ -1,20 +1,14 @@
 classdef prefField < handle
     properties (SetAccess = private)
-        label
+        label matlab.ui.control.Label
         ui
     end
     
     methods
         function obj = prefField(container, pref_decl, config, push_callback)
-            label = uilabel(container);
-            obj.set_label(label, pref_decl);
-            
-            ui_fn = str2func(pref_decl.object);
-            ui = ui_fn(container);
-            obj.set_ui(ui, config, pref_decl);
-            ui.ValueChangedFcn = @(o,~)obj.update_to_config_callback(o);
-            
             pref_config = config.(pref_decl.config);
+            label = obj.create_label(container, pref_decl);
+            ui = obj.create_ui_widget(container, pref_decl, config, @(o,~)obj.update_to_config_callback(o));
             initial_value = pref_config.value;
             
             obj.config = config;
@@ -58,13 +52,21 @@ classdef prefField < handle
     end
     
     methods (Access = private, Static)
+        function label = create_label(parent, pref_decl)
+            label = uilabel(parent);
+            prefField.set_label(label, pref_decl);
+        end
+        
+        function ui = create_ui_widget(parent, pref_decl, config, update_fn)
+            ui_fn = str2func(pref_decl.object);
+            ui = ui_fn(parent);
+            prefField.set_ui(ui, config, pref_decl);
+            ui.ValueChangedFcn = update_fn;
+        end
+        
         function label = set_label(label, pref_decl)
             v = pref_decl.label;
-            f = fieldnames(v);
-            for i = 1 : numel(f)
-                field = f{i};
-                label.(field) = v.(field);
-            end
+            prefField.apply_fields_to_ui(label, v);
         end
         
         function ui = set_ui(ui, config, pref_decl)
@@ -73,32 +75,41 @@ classdef prefField < handle
             for i = 1 : numel(f)
                 field = f{i};
                 values = v.(field);
-                if ~iscell(values)
-                    values = {values};
-                end
-                for j = 1 : numel(values)
-                    values{j} = prefField.transform_ui(config, values{j});
-                end
-                try
-                    values = cell2mat(values);
-                catch
-                    try values = string(values); catch; end
-                end
+                values = prefField.transform_ui_values(config, values);
                 v.(field) = values;
             end
+            prefField.apply_fields_to_ui(ui, v);
+        end
+        
+        function apply_fields_to_ui(ui_handle, value_struct)
+            f = fieldnames(value_struct);
             for i = 1 : numel(f)
                 field = f{i};
-                ui.(field) = v.(field);
+                ui_handle.(field) = value_struct.(field);
             end
         end
         
-        function out = transform_ui(config, v)
-            if isfield(v, "config")
-                out = config.(v.config);
-            elseif isfield(v, "float")
-                out = str2double(v.float);
+        function values = transform_ui_values(config, values)
+            if ~iscell(values)
+                values = {values};
+            end
+            for j = 1 : numel(values)
+                values{j} = prefField.transform_ui_value(config, values{j});
+            end
+            try
+                values = cell2mat(values);
+            catch
+                try values = string(values); catch; end
+            end
+        end
+        
+        function out = transform_ui_value(config, value)
+            if isfield(value, "config")
+                out = config.(value.config);
+            elseif isfield(value, "float")
+                out = str2double(value.float);
             else
-                out = v;
+                out = value;
             end
             assert(~isstruct(out));
         end

@@ -8,6 +8,8 @@ classdef dapPreferences < handle
         end
         
         function register_callback(obj, tag, callback_fn)
+            % callback_fn takes no arguments and returns nothing
+            % used to call argument-less update functions on objects
             obj.callbacks(char(tag)) = callback_fn;
         end
         
@@ -29,67 +31,12 @@ classdef dapPreferences < handle
             obj.push_update();
         end
         
-        function ui_update_preferences(obj, x, y)
+        function ui_update_preferences(obj, app_window_x, app_window_y)
             old_config = obj.config.copy();
-            
-            % PREPARE FIGURE
-            f = uifigure();
-            f.Scrollable = "on";
-            W = 440;
-            H = 300;
-            y = y - H;
-            f.Position = [x y W H];
-            f.WindowStyle = "alwaysontop";
-            f.Resize = "off";
-            f.Name = "Preferences";
-            
-            % CREATE SCROLLABLE PANEL
-            p = uipanel(f);
-            y = 2 .* obj.PAD + obj.HEIGHT;
-            w = f.Position(3);
-            h = f.Position(4) - y + 1;
-            p.Position = [1 y w h];
-            total_height = p.Position(4);
-            
-            % CREATE PREF FIELDS
-            pref_declarations = read_json_file("prefs.json");
-            pref_keys = fieldnames(pref_declarations);
-            pref_count = numel(pref_keys);
-            
-            fields = prefField.empty(pref_count, 0);
-            for index = 1 : pref_count
-                pref_decl = pref_declarations.(pref_keys{index});
-                pf = prefField(p, pref_decl, obj.config, @obj.push_update);
-                pf.label.Position = dapPreferences.index_to_label_position(total_height, index);
-                pf.ui.Position = dapPreferences.index_to_ui_position(total_height, index);
-                pf.update_from_config();
-                fields(index) = pf;
-            end
-            
-            % RESET BUTTON
-            reset = uibutton(f);
-            reset.Text = "Reset to Default";
-            reset.Position = [obj.PAD, obj.PAD, obj.W_LEFT_BUTTON, obj.HEIGHT];
-            reset.ButtonPushedFcn = @(~, ~)obj.reset_to_default_callback_fn(fields);
-            
-            % ACCEPT BUTTON
-            count = 2;
-            x = count .* obj.PAD + count .* obj.W_RIGHT_BUTTON;
-            x = f.Position(3) - x;
-            accept = uibutton(f);
-            accept.Text = "Accept";
-            accept.Position = [x, obj.PAD, obj.W_RIGHT_BUTTON, obj.HEIGHT];
-            accept.ButtonPushedFcn = @(~, ~)obj.accept_callback_fn(f);
-            
-            % CANCEL BUTTON
-            w = obj.W_RIGHT_BUTTON;
-            x = x + obj.PAD + obj.W_RIGHT_BUTTON;
-            cancel = uibutton(f);
-            cancel.Text = "Cancel";
-            cancel.Position = [x, obj.PAD, w, obj.HEIGHT];
-            cancel.ButtonPushedFcn = @(~, ~)obj.cancel_callback_fn(old_config, f);
-            
-            % WAIT FOR USER TO FINISH
+            f = obj.create_figure(app_window_x, app_window_y, old_config);
+            p = obj.create_panel(f);
+            fields = obj.add_pref_fields(p);
+            obj.create_buttons(f, fields, old_config);
             uiwait(f);
         end
     end
@@ -109,11 +56,12 @@ classdef dapPreferences < handle
         W_RIGHT_BUTTON = 48;
         W_LEFT_BUTTON = 96;
         
-        HEIGHT = 23;
+        BUTTON_H = 23;
     end
     
     methods (Access = private)
         function push_update(obj)
+            % pushes changes by calling all registered callbacks
             keys = string(obj.callbacks.keys());
             for i = 1 : numel(keys)
                 fn = obj.callbacks(keys(i));
@@ -122,37 +70,104 @@ classdef dapPreferences < handle
         end
         
         function accept_callback_fn(obj, figure_handle)
+            % saves config if accept pushed
             obj.config.save();
             delete(figure_handle);
         end
         
         function cancel_callback_fn(obj, old_config, figure_handle)
+            % restored old config if cancel pushed
             old_config.apply_to(obj.config);
             obj.push_update();
             delete(figure_handle);
         end
         
         function reset_to_default_callback_fn(~, fields)
+            % sets all fields to default values if reset pushed
             for i = 1 : numel(fields)
                 field = fields(i);
                 field.reset_to_default();
             end
+        end
+        
+        function f = create_figure(obj, x, y, old_config)
+            f = uifigure();
+            f.Scrollable = "on";
+            W = 440;
+            H = 300;
+            y = y - H;
+            f.Position = [x y W H];
+            f.WindowStyle = "alwaysontop";
+            f.Resize = "off";
+            f.Name = "Preferences";
+            %f.CloseRequestFcn = @(~, ~)obj.cancel_callback_fn(old_config, f);
+        end
+        
+        function p = create_panel(obj, parent)
+            p = uipanel(parent);
+            y = 2 .* obj.PAD + obj.BUTTON_H;
+            w = parent.Position(3);
+            h = parent.Position(4) - y + 1;
+            p.Position = [1 y w h];
+        end
+        
+        function fields = add_pref_fields(obj, parent)
+            total_height = parent.Position(4);
+            
+            pref_declarations = read_json_file("prefs.json");
+            pref_keys = fieldnames(pref_declarations);
+            pref_count = numel(pref_keys);
+            
+            fields = prefField.empty(pref_count, 0);
+            for index = 1 : pref_count
+                pref_decl = pref_declarations.(pref_keys{index});
+                pf = prefField(parent, pref_decl, obj.config, @obj.push_update);
+                pf.label.Position = obj.index_to_label_position(total_height, index);
+                pf.ui.Position = obj.index_to_ui_position(total_height, index);
+                pf.update_from_config();
+                fields(index) = pf;
+            end
+        end
+        
+        function create_buttons(obj, parent, fields, old_config)
+            % RESET
+            reset = uibutton(parent);
+            reset.Text = "Reset to Default";
+            reset.Position = [obj.PAD, obj.PAD, obj.W_LEFT_BUTTON, obj.BUTTON_H];
+            reset.ButtonPushedFcn = @(~, ~)obj.reset_to_default_callback_fn(fields);
+            
+            % ACCEPT
+            count = 2;
+            x = count .* obj.PAD + count .* obj.W_RIGHT_BUTTON;
+            x = parent.Position(3) - x;
+            accept = uibutton(parent);
+            accept.Text = "Accept";
+            accept.Position = [x, obj.PAD, obj.W_RIGHT_BUTTON, obj.BUTTON_H];
+            accept.ButtonPushedFcn = @(~, ~)obj.accept_callback_fn(parent);
+            
+            % CANCEL
+            w = obj.W_RIGHT_BUTTON;
+            x = x + obj.PAD + obj.W_RIGHT_BUTTON;
+            cancel = uibutton(parent);
+            cancel.Text = "Cancel";
+            cancel.Position = [x, obj.PAD, w, obj.BUTTON_H];
+            cancel.ButtonPushedFcn = @(~, ~)obj.cancel_callback_fn(old_config, parent);
         end
     end
        
     methods (Access = private, Static)
         function pos = index_to_label_position(total_height, index)
             y = dapPreferences.index_to_y(total_height, index);
-            pos = [dapPreferences.PAD, y, dapPreferences.W_LABEL, dapPreferences.HEIGHT];
+            pos = [dapPreferences.PAD, y, dapPreferences.W_LABEL, dapPreferences.BUTTON_H];
         end
         
         function pos = index_to_ui_position(total_height, index)
             y = dapPreferences.index_to_y(total_height, index);
-            pos = [dapPreferences.X_UI, y, dapPreferences.W_UI, dapPreferences.HEIGHT];
+            pos = [dapPreferences.X_UI, y, dapPreferences.W_UI, dapPreferences.BUTTON_H];
         end
         
         function y = index_to_y(total_height, index)
-            y = total_height - (dapPreferences.HEIGHT .* index + dapPreferences.PAD .* index);
+            y = total_height - (dapPreferences.BUTTON_H .* index + dapPreferences.PAD .* index);
         end
     end
 end

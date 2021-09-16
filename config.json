@@ -18,6 +18,12 @@
         "value": "normal"
       }
     },
+    "legend": {
+      "location": {
+        "default": "North",
+        "value": "North"
+      }
+    },
     "x": {
       "label": {
         "default": "Minutes following photobleach",

@@ -12,7 +12,7 @@ classdef dapArrow < handle
         head (1,2) double % x,y pair
         tail (1,2) double % x,y pair
         line_width (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 2
-        head_size_pt (1,2) double {mustBeReal,mustBeFinite,mustBePositive} = [24 24] % x,y pair
+        head_size_pt (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 24 % x,y pair
         color Color = Color.BLUE()
         visible (1,1) logical = false;
     end
@@ -89,7 +89,7 @@ classdef dapArrow < handle
             
             % compute head triangle
             BASE_TRIANGLE = [-1 -0.5; 0 0; -1 0.5]; % origin is at tip, unitless
-            tri = BASE_TRIANGLE .* obj.head_size_pt; % pt
+            tri = BASE_TRIANGLE .* obj.head_size_pt .* ones([1 2]); % pt
             r = obj.compute_rotation_matrix(theta_inv_line); % pt
             tri = (s * r * tri.').'; % pt -> data
             tri = tri + obj.head; % data

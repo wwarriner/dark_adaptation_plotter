@@ -4,9 +4,10 @@ classdef dapPlots < handle
     end
     
     methods
-        function obj = dapPlots(dap_axes)
+        function obj = dapPlots(config, dap_axes)
             plots = containers.Map("keytype", "char", "valuetype", "any");
             
+            obj.config = config;
             obj.dap_axes = dap_axes;
             obj.plots = plots;
         end
@@ -103,6 +104,8 @@ classdef dapPlots < handle
             for i = 1 : numel(current_ids)
                 plot = obj.plots(current_ids(i));
                 if plot.visible
+                    plot.arrow_line_width_pt = obj.config.plot.arrow.line_width_pt.value;
+                    plot.arrow_head_size_pt = obj.config.plot.arrow.head_size_pt.value;
                     plot.update();
                 end
             end
@@ -116,6 +119,7 @@ classdef dapPlots < handle
     end
     
     properties (Access = private)
+        config Config
         dap_axes dapAxes
         plots containers.Map
     end

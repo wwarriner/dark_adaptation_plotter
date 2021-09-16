@@ -18,6 +18,12 @@
         "value": "normal"
       }
     },
+    "legend": {
+      "location": {
+        "default": "North",
+        "value": "North"
+      }
+    },
     "x": {
       "label": {
         "default": "Minutes following photobleach",
@@ -74,10 +80,10 @@
   "plot": {
     "arrow": {
       "head_size_pt": {
-        "default": [24, 24],
-        "value": [24, 24]
+        "default": 12,
+        "value": 12
       },
-      "width": {
+      "line_width_pt": {
         "default": 2,
         "value": 2
       }

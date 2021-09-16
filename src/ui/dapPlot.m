@@ -13,6 +13,8 @@ classdef dapPlot < handle
         marker_size (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 8
         color Color = Color.BLUE()
         visible (1,1) logical = false
+        arrow_line_width_pt (1,1) = 2;
+        arrow_head_size_pt (1,1) = 12;
         legend_display_name (1,1) string = ""
     end
     
@@ -68,6 +70,8 @@ classdef dapPlot < handle
             obj.arrow.head = [r obj.axes_handle.YLim(2)]; % always touches edge of axes
             obj.arrow.tail = [r 3.0]; % always starts at recovery line, 3.0 = recovery_log_sensitivity from config
             % TODO tie this to recovery line
+            obj.arrow.line_width = obj.arrow_line_width_pt;
+            obj.arrow.head_size_pt = obj.arrow_head_size_pt;
             obj.arrow.color = obj.color;
             obj.arrow.visible = obj.visible;
             

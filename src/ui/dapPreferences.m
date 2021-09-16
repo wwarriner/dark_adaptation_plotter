@@ -122,7 +122,7 @@ classdef dapPreferences < handle
         end
         
         function fields = add_pref_fields(obj, parent)
-            pref_declarations = read_json_file("prefs.json");
+            pref_declarations = read_json_file("res/prefs.json");
             pref_keys = fieldnames(pref_declarations);
             pref_count = numel(pref_keys);
             

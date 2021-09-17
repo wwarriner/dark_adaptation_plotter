@@ -76,19 +76,27 @@ classdef dapOutputFiles < handle
             [new_axh, new_lh] = obj.dap_axes.copyobj(fh);
             
             new_axh.OuterPosition(1:2) = [1 1];
-            new_axh.OuterPosition(3) = obj.desired_size;
-            new_axh.OuterPosition(4) = obj.desired_size;
+            new_axh.OuterPosition(3:4) = obj.desired_size_px;
             new_axh.Toolbar = [];
             new_axh.Interactions = [];
             new_axh.HitTest = "off";
+            new_axh.PositionConstraint = "outerposition";
             
-            new_lh.Parent = fh; % copyobj should handle this yet here we are
-            new_lh.Location = "eastoutside";
             new_lh.HitTest = "off";
             
-            fig_width = new_lh.Position(1) + new_lh.Position(3);
-            fig_height = new_axh.OuterPosition(4);
-            fh.Position(3:4) = [fig_width fig_height];
+            loc = new_lh.Location;
+            east_west = contains(loc, "east") || contains(loc, "west");
+            north_south = contains(loc, "north") || contains(loc, "south");
+            outside = contains(loc, "outside");
+            fig_w = new_axh.OuterPosition(3);
+            if east_west && outside
+                fig_w = fig_w + new_lh.Position(3);
+            end
+            fig_h = new_axh.OuterPosition(4);
+            if north_south && outside
+                fig_h = fig_h + new_lh.Position(4);
+            end
+            fh.Position(3:4) = [fig_w fig_h];
         end
     end
 end

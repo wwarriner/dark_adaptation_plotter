@@ -90,16 +90,22 @@ classdef prefField < handle
         end
         
         function values = transform_ui_values(config, values)
+            remove_from_cell = false;
             if ~iscell(values)
+                remove_from_cell = true;
                 values = {values};
             end
             for j = 1 : numel(values)
                 values{j} = prefField.transform_ui_value(config, values{j});
             end
-            try
-                values = cell2mat(values);
-            catch
-                try values = string(values); catch; end
+            if remove_from_cell
+                values = values{1};
+            else
+                try
+                    values = cell2mat(values);
+                catch
+                    try values = string(values); catch; end
+                end
             end
         end
         

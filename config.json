@@ -69,6 +69,23 @@
       }
     }
   },
+  "export": {
+    "desired_size_px": {
+      "default": 500,
+      "value": 500
+    },
+    "extension": {
+      "default": ".png",
+      "value": ".png"
+    },
+    "output_name": {
+      "default": "out",
+      "value": "out"
+    },
+    "valid_extensions": {
+      "value": [".png", ".pdf", ".eps"]
+    }
+  },
   "files": {
     "input_folder": {
       "value": ""

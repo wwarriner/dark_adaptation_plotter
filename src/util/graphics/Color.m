@@ -61,6 +61,12 @@ classdef Color < handle
             new = Color();
             new.lab = value;
         end
+        
+        function show_swatch(obj)
+            im = reshape(obj.rgb, [1 1 3]) .* ones(256, 256, 3);
+            figure();
+            imshow(im);
+        end
     end
     
     methods % properties

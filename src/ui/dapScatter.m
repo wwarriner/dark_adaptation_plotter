@@ -17,9 +17,16 @@ classdef dapScatter < handle
         y (:,1) double
         marker (1,1) string = "d"
         marker_size (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 8
+        marker_edge_color (1,1) string = "inverse" % "same", "black", "inverse"
         color Color = Color.BLUE()
         visible (1,1) logical = false
         legend_display_name (1,1) string = ""
+    end
+    
+    properties (Constant)
+        SAME = "same";
+        BLACK = "black";
+        INVERSE = "inverse";
     end
     
     methods
@@ -82,7 +89,18 @@ classdef dapScatter < handle
             h.Marker = obj.marker;
             h.MarkerSize = obj.marker_size;
             h.MarkerFaceColor = obj.color.rgb;
-            h.MarkerEdgeColor = obj.color.rgb;
+            
+            mec = obj.marker_edge_color;
+            if strcmpi(mec, obj.SAME)
+                h.MarkerEdgeColor = obj.color.rgb;
+            elseif strcmpi(mec, obj.BLACK)
+                h.MarkerEdgeColor = [0.0 0.0 0.0];
+            elseif strcmpi(mec, obj.INVERSE)
+                color_inv = obj.color.inverse_lab();
+                h.MarkerEdgeColor = color_inv.rgb;
+            else
+            end
+            
             h.Color = "none";
             h.Visible = obj.visible;
             if obj.visible

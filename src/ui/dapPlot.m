@@ -11,6 +11,7 @@ classdef dapPlot < handle
     properties
         marker (1,1) string = "d"
         marker_size (1,1) double {mustBeReal,mustBeFinite,mustBePositive} = 8
+        marker_edge_color (1,1) string = dapScatter.SAME
         color Color = Color.BLUE()
         visible (1,1) logical = false
         arrow_line_width_pt (1,1) = 2;
@@ -62,6 +63,7 @@ classdef dapPlot < handle
             obj.scatter.y = obj.patient.sensitivity;
             obj.scatter.marker = obj.marker;
             obj.scatter.marker_size = obj.marker_size;
+            obj.scatter.marker_edge_color = obj.marker_edge_color;
             obj.scatter.color = obj.color;
             obj.scatter.visible = obj.visible;
             obj.scatter.legend_display_name = obj.legend_display_name;

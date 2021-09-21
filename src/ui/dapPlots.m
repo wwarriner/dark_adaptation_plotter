@@ -58,7 +58,7 @@ classdef dapPlots < handle
             plot = obj.plots(id);
             previously_visible = plot.visible;
             plot.visible = visible;
-            plot.update();
+            obj.update_plot(plot);
             
             if visible && ~previously_visible
                 plot.apply(@(varargin)obj.dap_axes.add_to_legend(varargin{:}));
@@ -104,9 +104,7 @@ classdef dapPlots < handle
             for i = 1 : numel(current_ids)
                 plot = obj.plots(current_ids(i));
                 if plot.visible
-                    plot.arrow_line_width_pt = obj.config.plot.arrow.line_width_pt.value;
-                    plot.arrow_head_size_pt = obj.config.plot.arrow.head_size_pt.value;
-                    plot.update();
+                    obj.update_plot(plot);
                 end
             end
         end
@@ -122,6 +120,16 @@ classdef dapPlots < handle
         config Config
         dap_axes dapAxes
         plots containers.Map
+    end
+    
+    methods (Access = private)
+        % TODO move into dapPlot with config, this is an anti-pattern
+        function update_plot(obj, plot)
+            plot.arrow_line_width_pt = obj.config.plot.arrow.line_width_pt.value;
+            plot.arrow_head_size_pt = obj.config.plot.arrow.head_size_pt.value;
+            plot.marker_edge_color = obj.config.plot.scatter.marker_edge_color.value;
+            plot.update();
+        end
     end
 end
 

@@ -106,6 +106,10 @@
       }
     },
     "scatter": {
+      "marker_edge_color": {
+        "default": "Black",
+        "value": "Black"
+      },
       "marker_size": {
         "default": 8,
         "value": 8

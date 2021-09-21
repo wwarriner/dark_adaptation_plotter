@@ -27,6 +27,15 @@
       "UpperLimitInclusive": true
     }
   },
+  "marker_edge_color": {
+    "object": "uidropdown",
+    "config": "plot.scatter.marker_edge_color",
+    "label": { "Text": "Marker edge color" },
+    "ui": {
+      "Items": ["Same", "Black", "Invert"],
+      "Value": { "config": "plot.scatter.marker_edge_color.value" }
+    }
+  },
   "legend_location": {
     "object": "uidropdown",
     "config": "axes.legend.location",

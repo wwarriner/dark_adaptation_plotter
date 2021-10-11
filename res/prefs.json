@@ -1,0 +1,196 @@
+{
+  "arrow_head_size_pt": {
+    "object": "uispinner",
+    "config": "plot.arrow.head_size_pt",
+    "label": { "Text": "Arrow head size (pt)" },
+    "ui": {
+      "Value": { "config": "plot.arrow.head_size_pt.value" },
+      "Limits": [1, 72],
+      "Step": 1,
+      "RoundFractionalValues": true,
+      "ValueDisplayFormat": "%d",
+      "LowerLimitInclusive": true,
+      "UpperLimitInclusive": true
+    }
+  },
+  "arrow_line_width_pt": {
+    "object": "uispinner",
+    "config": "plot.arrow.line_width_pt",
+    "label": { "Text": "Arrow line width (pt)" },
+    "ui": {
+      "Value": { "config": "plot.arrow.line_width_pt.value" },
+      "Limits": [0.5, 6],
+      "Step": 0.5,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.1f",
+      "LowerLimitInclusive": true,
+      "UpperLimitInclusive": true
+    }
+  },
+  "marker_edge_color": {
+    "object": "uidropdown",
+    "config": "plot.scatter.marker_edge_color",
+    "label": { "Text": "Marker edge color" },
+    "ui": {
+      "Items": ["Same", "Black", "Invert"],
+      "Value": { "config": "plot.scatter.marker_edge_color.value" }
+    }
+  },
+  "legend_location": {
+    "object": "uidropdown",
+    "config": "axes.legend.location",
+    "label": { "Text": "Legend location" },
+    "ui": {
+      "Items": [
+        "North",
+        "South",
+        "East",
+        "NorthEast",
+        "SouthEast",
+        "NorthOutside",
+        "SouthOutside",
+        "EastOutside",
+        "Best",
+        "BestOutside"
+      ],
+      "Value": { "config": "axes.legend.location.value" }
+    }
+  },
+  "x_axis_title": {
+    "object": "uieditfield",
+    "config": "axes.x.label",
+    "label": { "Text": "X axis title" },
+    "ui": {
+      "Value": { "config": "axes.x.label.value" }
+    }
+  },
+  "x_max": {
+    "object": "uispinner",
+    "config": "axes.x.max",
+    "label": { "Text": "X axis maximum" },
+    "ui": {
+      "Value": { "config": "axes.x.max.value" },
+      "Limits": [{ "config": "axes.x.min.value" }, { "float": "inf" }],
+      "Step": { "config": "axes.x.step.value" },
+      "RoundFractionalValues": true,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "x_major_tick": {
+    "object": "uispinner",
+    "config": "axes.x.step",
+    "label": { "Text": "X axis major tick" },
+    "ui": {
+      "Value": { "config": "axes.x.step.value" },
+      "Limits": [0, { "float": "inf" }],
+      "Step": 0.5,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "x_minor_tick": {
+    "object": "uispinner",
+    "config": "axes.x.minor_step",
+    "label": { "Text": "X axis minor tick" },
+    "ui": {
+      "Value": { "config": "axes.x.minor_step.value" },
+      "Limits": [0, { "float": "inf" }],
+      "Step": 0.1,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "y_axis_title": {
+    "object": "uieditfield",
+    "config": "axes.y.label",
+    "label": { "Text": "Y axis title" },
+    "ui": {
+      "Value": { "config": "axes.y.label.value" }
+    }
+  },
+  "y_min": {
+    "object": "uispinner",
+    "config": "axes.y.min",
+    "label": { "Text": "Y axis minimum" },
+    "ui": {
+      "Value": { "config": "axes.y.min.value" },
+      "Limits": [{ "float": "-inf" }, { "config": "axes.y.max.value" }],
+      "Step": { "config": "axes.y.step.value" },
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "y_max": {
+    "object": "uispinner",
+    "config": "axes.y.max",
+    "label": { "Text": "Y axis maximum" },
+    "ui": {
+      "Value": { "config": "axes.y.max.value" },
+      "Limits": [{ "config": "axes.y.min.value" }, { "float": "inf" }],
+      "Step": { "config": "axes.y.step.value" },
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "y_major_tick": {
+    "object": "uispinner",
+    "config": "axes.y.step",
+    "label": { "Text": "Y axis major tick" },
+    "ui": {
+      "Value": { "config": "axes.y.step.value" },
+      "Limits": [0, { "float": "inf" }],
+      "Step": 0.5,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "y_minor_tick": {
+    "object": "uispinner",
+    "config": "axes.y.minor_step",
+    "label": { "Text": "Y axis minor tick" },
+    "ui": {
+      "Value": { "config": "axes.y.minor_step.value" },
+      "Limits": [0, { "float": "inf" }],
+      "Step": 0.1,
+      "RoundFractionalValues": false,
+      "ValueDisplayFormat": "%.2f",
+      "LowerLimitInclusive": false,
+      "UpperLimitInclusive": false
+    }
+  },
+  "export_desired_size_px": {
+    "object": "uispinner",
+    "config": "export.desired_size_px",
+    "label": { "Text": "Desired export size (px)" },
+    "ui": {
+      "Value": { "config": "export.desired_size_px.value" },
+      "Limits": [200, 4000],
+      "Step": 100,
+      "RoundFractionalValues": true,
+      "ValueDisplayFormat": "%d",
+      "LowerLimitInclusive": true,
+      "UpperLimitInclusive": true
+    }
+  },
+  "export_extension": {
+    "object": "uidropdown",
+    "config": "export.extension",
+    "label": { "Text": "Default export extension" },
+    "ui": {
+      "Items": { "config": "export.valid_extensions.value" },
+      "Value": { "config": "export.extension.value" }
+    }
+  }
+}

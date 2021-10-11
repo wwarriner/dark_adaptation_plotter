@@ -63,6 +63,8 @@ classdef dapAxes < handle
             h.FontWeight = font_weight;
             h.FontAngle = font_angle;
             
+            obj.legend_handle.Location = obj.config.axes.legend.location.value;
+            
             keys = string(obj.callbacks.keys());
             for i = 1 : numel(keys)
                 fn = obj.callbacks(keys(i));
@@ -77,6 +79,22 @@ classdef dapAxes < handle
             [varargout{1:nargout}] = draw_fn(obj.axes_handle);
         end
         
+        function add_to_legend(obj, handle, label)
+            label = string(label);
+            obj.legend_plot_handles = [obj.legend_plot_handles handle];
+            obj.legend_plot_labels = [obj.legend_plot_labels label];
+            obj.update_legend_contents();
+            obj.update();
+        end
+        
+        function remove_from_legend(obj, handle, ~)
+            index = obj.legend_plot_handles == handle;
+            obj.legend_plot_handles(index) = [];
+            obj.legend_plot_labels(index) = [];
+            obj.update_legend_contents();
+            obj.update();
+        end
+        
         function register_callback(obj, tag, fn)
             obj.callbacks(char(tag)) = fn;
         end
@@ -86,6 +104,8 @@ classdef dapAxes < handle
             h = copyobj(h, parent_handle);
             new_axes = h(1);
             new_legend = h(2);
+            new_legend.Parent = parent_handle;
+            new_legend.Location = obj.legend_handle.Location;
         end
     end
     
@@ -96,6 +116,9 @@ classdef dapAxes < handle
         layout_handle matlab.graphics.layout.TiledChartLayout
         axes_handle matlab.graphics.Graphics
         legend_handle matlab.graphics.illustration.Legend
+        
+        legend_plot_handles matlab.graphics.Graphics
+        legend_plot_labels string
         
         callbacks containers.Map
     end
@@ -133,7 +156,23 @@ classdef dapAxes < handle
             h.Layout.TileSpan = obj.LEGEND_TILE_SPAN;
             h.Layout.Tile = obj.LEGEND_TILE;
             h.Units = "pixels";
+            h.Interpreter = "none";
+            h.AutoUpdate = "off";
             legend_handle = h;
+        end
+        
+        function update_legend_contents(obj)
+            obj.legend_handle = legend(obj.axes_handle, obj.legend_plot_handles);
+            if isempty(obj.legend_plot_labels)
+                % HACK need to rebuild the legend to empty it out
+                % setting empty string array has no effect (grays out last entry
+                % instead of removing it)
+                % SUBMIT BUG REPORT TO MATHWORKS
+                legend(obj.axes_handle, "off");
+                obj.legend_handle = obj.build_legend(obj.axes_handle);
+            else
+                obj.legend_handle.String = obj.legend_plot_labels;
+            end
         end
         
         function v = get_x_value(obj, key)

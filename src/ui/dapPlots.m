@@ -4,9 +4,10 @@ classdef dapPlots < handle
     end
     
     methods
-        function obj = dapPlots(dap_axes)
+        function obj = dapPlots(config, dap_axes)
             plots = containers.Map("keytype", "char", "valuetype", "any");
             
+            obj.config = config;
             obj.dap_axes = dap_axes;
             obj.plots = plots;
         end
@@ -30,8 +31,8 @@ classdef dapPlots < handle
             for i = 1 : numel(patients)
                 patient = patients{i};
                 plot = dapPlot(patient);
-                plot.display_name = patient.id;
-                obj.dap_axes.draw_on(@plot.draw);
+                plot.legend_display_name = patient.id;
+                obj.dap_axes.draw_on(@plot.set_parent);
                 id = patient.id;
                 obj.plots(char(id)) = plot;
             end
@@ -55,8 +56,19 @@ classdef dapPlots < handle
             assert(islogical(visible));
             
             plot = obj.plots(id);
+            previously_visible = plot.visible;
             plot.visible = visible;
-            plot.update();
+            obj.update_plot(plot);
+            
+            if visible && ~previously_visible
+                plot.apply(@(varargin)obj.dap_axes.add_to_legend(varargin{:}));
+            elseif ~visible && previously_visible
+                plot.apply(@(varargin)obj.dap_axes.remove_from_legend(varargin{:}));
+            else
+                % (visible && previously_visible)
+                % || (~visible && ~previously_visible)
+                % noop
+            end
         end
         
         function update_color(obj, id, color)
@@ -92,7 +104,7 @@ classdef dapPlots < handle
             for i = 1 : numel(current_ids)
                 plot = obj.plots(current_ids(i));
                 if plot.visible
-                    plot.update();
+                    obj.update_plot(plot);
                 end
             end
         end
@@ -105,8 +117,19 @@ classdef dapPlots < handle
     end
     
     properties (Access = private)
+        config Config
         dap_axes dapAxes
         plots containers.Map
+    end
+    
+    methods (Access = private)
+        % TODO move into dapPlot with config, this is an anti-pattern
+        function update_plot(obj, plot)
+            plot.arrow_line_width_pt = obj.config.plot.arrow.line_width_pt.value;
+            plot.arrow_head_size_pt = obj.config.plot.arrow.head_size_pt.value;
+            plot.marker_edge_color = obj.config.plot.scatter.marker_edge_color.value;
+            plot.update();
+        end
     end
 end
 

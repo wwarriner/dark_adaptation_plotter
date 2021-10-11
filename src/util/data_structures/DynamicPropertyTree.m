@@ -3,6 +3,7 @@ classdef DynamicPropertyTree < dynamicprops ...
         & matlab.mixin.Copyable
     methods
         function obj = DynamicPropertyTree(varargin)
+            obj.meta_handles____ = containers.Map();
             if nargin == 0
                 return;
             elseif nargin == 1
@@ -14,7 +15,36 @@ classdef DynamicPropertyTree < dynamicprops ...
             end
         end
         
-        function s = struct(obj)
+        function clear(obj)
+            obj.make_mutable();
+            fields = string(fieldnames(obj));
+            for i = 1 : numel(fields)
+                key = fields(i);
+                value = obj.(key);
+                if isobject(value) && ~isstring(value)
+                    value.clear();
+                end
+                obj.rmprop(key);
+            end
+            obj.make_immutable();
+        end
+        
+        function m = to_map(obj)
+            fields = string(fieldnames(obj));
+            child_count = numel(fields);
+            values = cell(child_count, 1);
+            for i = 1 : child_count
+                key = fields(i);
+                value = obj.(key);
+                if isobject(value) && ~isstring(value)
+                    value = value.to_map();
+                end
+                values{i} = value;
+            end
+            m = containers.Map(fields, values);
+        end
+        
+        function s = to_struct(obj)
             s = struct();
             fields = string(fieldnames(obj));
             child_count = numel(fields);
@@ -22,7 +52,7 @@ classdef DynamicPropertyTree < dynamicprops ...
                 key = fields(i);
                 value = obj.(key);
                 if isobject(value) && ~isstring(value)
-                    value = value.struct();
+                    value = value.to_struct();
                 end
                 s.(key) = value;
             end
@@ -105,9 +135,19 @@ classdef DynamicPropertyTree < dynamicprops ...
             value = sort(builtin("fieldnames", obj));
         end
         
-        function addprop(obj, varargin)
+        function addprop(obj, name)
             if obj.is_mutable()
-                addprop@dynamicprops(obj, varargin{:});
+                obj.meta_handles____(name) = addprop@dynamicprops(obj, name);
+            else
+                me = error("Adding properties is not allowed.");
+                throwAsCaller(me);
+            end
+        end
+        
+        function rmprop(obj, name)
+            if obj.is_mutable()
+                h = obj.meta_handles____(name);
+                delete(h);
             else
                 me = error("Adding properties is not allowed.");
                 throwAsCaller(me);
@@ -132,7 +172,7 @@ classdef DynamicPropertyTree < dynamicprops ...
                 obj.addprop(key);
                 obj.(key) = value;
             end
-            obj.remove_mutability();
+            obj.make_immutable();
         end
     end
     
@@ -146,8 +186,12 @@ classdef DynamicPropertyTree < dynamicprops ...
             mutable = obj.is_mutable____;
         end
         
-        function remove_mutability(obj)
+        function make_immutable(obj)
             obj.is_mutable____ = false;
+        end
+        
+        function make_mutable(obj)
+            obj.is_mutable____ = true;
         end
         
         function new = copyElement(obj)
@@ -175,6 +219,7 @@ classdef DynamicPropertyTree < dynamicprops ...
     
     properties (Access = private)
         is_mutable____(1,1) logical = true
+        meta_handles____ containers.Map
     end
 end
 

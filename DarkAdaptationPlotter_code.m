@@ -112,20 +112,21 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             da = dapAxes(app.AxesPanel, config);
             
             recovery_line = dapRecoveryLine();
-            da.draw_on(@recovery_line.draw);
+            da.draw_on(@recovery_line.set_parent);
             da.register_callback("recovery_line", @recovery_line.update);
             da.update();
             
             dd = dapData();
             dt = dapPlotTable(app.Table);
-            dp = dapPlots(da);
+            dp = dapPlots(config, da);
             
-            dof = dapOutputFiles(da);
-            dif = dapInputFiles(dd, dt, dp);
+            dof = dapOutputFiles(config, da);
+            dif = dapInputFiles(config, dd, dt, dp);
             
-            dpref = dapPreferences(config);
+            dpref = dapPreferences(config, [440, 300], "res/prefs.json");
             dpref.register_callback("dapAxes", @da.update);
             dpref.register_callback("dapPlots", @dp.update_draw);
+            dpref.register_callback("dapOutputFiles", @dof.update);
             
             app.dap_axes = da;
             app.dap_data = dd;
@@ -223,13 +224,13 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         
         % Menu selected function: ExportPreviewMenu
         function ExportPreviewMenuSelected(app, event)
-            app.dap_output_files.ui_run_export_preview();
+            app.dap_output_files.ui_run_export_preview(app.UIFigure);
         end
         
         % Menu selected function: ExportAsMenu
         function ExportAsMenuSelected(app, event)
             assert(~isempty(app.dap_output_files));
-            app.dap_output_files.ui_run_export_as();
+            app.dap_output_files.ui_run_export_as(app.UIFigure);
         end
         
         % Menu selected function: ExitMenu

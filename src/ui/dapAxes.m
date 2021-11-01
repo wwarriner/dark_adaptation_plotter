@@ -104,6 +104,8 @@ classdef dapAxes < handle
             h = copyobj(h, parent_handle);
             new_axes = h(1);
             new_legend = h(2);
+            new_legend.Parent = parent_handle;
+            new_legend.Location = obj.legend_handle.Location;
         end
     end
     

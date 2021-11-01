@@ -27,6 +27,15 @@
       "UpperLimitInclusive": true
     }
   },
+  "marker_edge_color": {
+    "object": "uidropdown",
+    "config": "plot.scatter.marker_edge_color",
+    "label": { "Text": "Marker edge color" },
+    "ui": {
+      "Items": ["Same", "Black", "Invert"],
+      "Value": { "config": "plot.scatter.marker_edge_color.value" }
+    }
+  },
   "legend_location": {
     "object": "uidropdown",
     "config": "axes.legend.location",
@@ -159,6 +168,29 @@
       "ValueDisplayFormat": "%.2f",
       "LowerLimitInclusive": false,
       "UpperLimitInclusive": false
+    }
+  },
+  "export_desired_size_px": {
+    "object": "uispinner",
+    "config": "export.desired_size_px",
+    "label": { "Text": "Desired export size (px)" },
+    "ui": {
+      "Value": { "config": "export.desired_size_px.value" },
+      "Limits": [200, 4000],
+      "Step": 100,
+      "RoundFractionalValues": true,
+      "ValueDisplayFormat": "%d",
+      "LowerLimitInclusive": true,
+      "UpperLimitInclusive": true
+    }
+  },
+  "export_extension": {
+    "object": "uidropdown",
+    "config": "export.extension",
+    "label": { "Text": "Default export extension" },
+    "ui": {
+      "Items": { "config": "export.valid_extensions.value" },
+      "Value": { "config": "export.extension.value" }
     }
   }
 }

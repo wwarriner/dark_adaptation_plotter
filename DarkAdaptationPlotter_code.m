@@ -2,21 +2,21 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
     
     % Properties that correspond to app components
     properties (Access = public)
-        UIFigure           matlab.ui.Figure
-        FileParentMenu     matlab.ui.container.Menu
-        OpenDataMenu       matlab.ui.container.Menu
-        ClearDataMenu      matlab.ui.container.Menu
-        ExportPreviewMenu  matlab.ui.container.Menu
-        ExportAsMenu       matlab.ui.container.Menu
-        ExitMenu           matlab.ui.container.Menu
-        EditMenu           matlab.ui.container.Menu
-        FontMenu           matlab.ui.container.Menu
-        PreferencesMenu    matlab.ui.container.Menu
-        HelpParentMenu     matlab.ui.container.Menu
-        HelpMenu           matlab.ui.container.Menu
-        AboutMenu          matlab.ui.container.Menu
-        AxesPanel          matlab.ui.container.Panel
-        Table              matlab.ui.control.Table
+        DarkAdaptationPlotterUIFigure  matlab.ui.Figure
+        FileParentMenu                 matlab.ui.container.Menu
+        OpenDataMenu                   matlab.ui.container.Menu
+        ClearDataMenu                  matlab.ui.container.Menu
+        ExportPreviewMenu              matlab.ui.container.Menu
+        ExportAsMenu                   matlab.ui.container.Menu
+        ExitMenu                       matlab.ui.container.Menu
+        EditMenu                       matlab.ui.container.Menu
+        FontMenu                       matlab.ui.container.Menu
+        PreferencesMenu                matlab.ui.container.Menu
+        HelpParentMenu                 matlab.ui.container.Menu
+        HelpMenu                       matlab.ui.container.Menu
+        AboutMenu                      matlab.ui.container.Menu
+        AxesPanel                      matlab.ui.container.Panel
+        Table                          matlab.ui.control.Table
     end
     
     properties (Access = private)
@@ -71,7 +71,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         end
         
         function resize(app)
-            position = app.UIFigure.Position;
+            position = app.DarkAdaptationPlotterUIFigure.Position;
             
             % table
             TABLE_X_FRACTION = 0.33;
@@ -123,9 +123,10 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             dof = dapOutputFiles(config, da);
             dif = dapInputFiles(config, dd, dt, dp);
             
-            dpref = dapPreferences(config, [440, 300]);
+            dpref = dapPreferences(config, [440, 300], "res/prefs.json");
             dpref.register_callback("dapAxes", @da.update);
             dpref.register_callback("dapPlots", @dp.update_draw);
+            dpref.register_callback("dapOutputFiles", @dof.update);
             
             app.dap_axes = da;
             app.dap_data = dd;
@@ -138,8 +139,8 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             resize(app);
         end
         
-        % Size changed function: UIFigure
-        function UIFigureSizeChanged(app, event)
+        % Size changed function: DarkAdaptationPlotterUIFigure
+        function DarkAdaptationPlotterUIFigureSizeChanged(app, event)
             if isempty(app.dap_axes)
                 return;
             end
@@ -188,7 +189,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         % Menu selected function: OpenDataMenu
         function OpenDataMenuSelected(app, event)
             assert(~isempty(app.dap_input_files));
-            app.dap_input_files.ui_open_file(app.UIFigure)
+            app.dap_input_files.ui_open_file(app.DarkAdaptationPlotterUIFigure)
         end
         
         % Menu selected function: ClearDataMenu
@@ -202,7 +203,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             CANCEL_OPT = "Go back";
             CANCEL_NUM = 2;
             selection = uiconfirm(...
-                app.UIFigure, ...
+                app.DarkAdaptationPlotterUIFigure, ...
                 ["Really clear all data?" "This cannot be undone."], ...
                 "Clear data?", ...
                 "options", [CLEAR_OPT CANCEL_OPT], ...
@@ -223,18 +224,18 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         
         % Menu selected function: ExportPreviewMenu
         function ExportPreviewMenuSelected(app, event)
-            app.dap_output_files.ui_run_export_preview(app.UIFigure);
+            app.dap_output_files.ui_run_export_preview(app.DarkAdaptationPlotterUIFigure);
         end
         
         % Menu selected function: ExportAsMenu
         function ExportAsMenuSelected(app, event)
             assert(~isempty(app.dap_output_files));
-            app.dap_output_files.ui_run_export_as(app.UIFigure);
+            app.dap_output_files.ui_run_export_as(app.DarkAdaptationPlotterUIFigure);
         end
         
         % Menu selected function: ExitMenu
         function ExitMenuSelected(app, event)
-            app.UIFigureCloseRequest(event);
+            app.DarkAdaptationPlotterUIFigureCloseRequest(event);
         end
         
         % Menu selected function: FontMenu
@@ -246,19 +247,19 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         % Menu selected function: PreferencesMenu
         function PreferencesMenuSelected(app, event)
             assert(~isempty(app.dap_preferences));
-            p = app.UIFigure.Position;
+            p = app.DarkAdaptationPlotterUIFigure.Position;
             x = p(1) + 24;
             y = p(4) + p(2) - 1 - 24;
             app.dap_preferences.ui_update_preferences(x, y);
         end
         
-        % Close request function: UIFigure
-        function UIFigureCloseRequest(app, event)
+        % Close request function: DarkAdaptationPlotterUIFigure
+        function DarkAdaptationPlotterUIFigureCloseRequest(app, event)
             EXIT_OPT = "Exit now";
             CANCEL_OPT = "Go back";
             CANCEL_NUM = 2;
             selection = uiconfirm(...
-                app.UIFigure, ...
+                app.DarkAdaptationPlotterUIFigure, ...
                 "Are you sure you want to exit?", ...
                 "Exit?", ...
                 "options", [EXIT_OPT, CANCEL_OPT], ...
@@ -279,16 +280,16 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         % Create UIFigure and components
         function createComponents(app)
             
-            % Create UIFigure and hide until all components are created
-            app.UIFigure = uifigure('Visible', 'off');
-            app.UIFigure.AutoResizeChildren = 'off';
-            app.UIFigure.Position = [100 100 1200 600];
-            app.UIFigure.Name = 'MATLAB App';
-            app.UIFigure.CloseRequestFcn = createCallbackFcn(app, @UIFigureCloseRequest, true);
-            app.UIFigure.SizeChangedFcn = createCallbackFcn(app, @UIFigureSizeChanged, true);
+            % Create DarkAdaptationPlotterUIFigure and hide until all components are created
+            app.DarkAdaptationPlotterUIFigure = uifigure('Visible', 'off');
+            app.DarkAdaptationPlotterUIFigure.AutoResizeChildren = 'off';
+            app.DarkAdaptationPlotterUIFigure.Position = [100 100 1200 600];
+            app.DarkAdaptationPlotterUIFigure.Name = 'Dark Adaptation Plotter';
+            app.DarkAdaptationPlotterUIFigure.CloseRequestFcn = createCallbackFcn(app, @DarkAdaptationPlotterUIFigureCloseRequest, true);
+            app.DarkAdaptationPlotterUIFigure.SizeChangedFcn = createCallbackFcn(app, @DarkAdaptationPlotterUIFigureSizeChanged, true);
             
             % Create FileParentMenu
-            app.FileParentMenu = uimenu(app.UIFigure);
+            app.FileParentMenu = uimenu(app.DarkAdaptationPlotterUIFigure);
             app.FileParentMenu.Text = 'File';
             
             % Create OpenDataMenu
@@ -319,7 +320,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             app.ExitMenu.Text = 'Exit';
             
             % Create EditMenu
-            app.EditMenu = uimenu(app.UIFigure);
+            app.EditMenu = uimenu(app.DarkAdaptationPlotterUIFigure);
             app.EditMenu.Text = 'Edit';
             
             % Create FontMenu
@@ -333,7 +334,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             app.PreferencesMenu.Text = 'Preferences...';
             
             % Create HelpParentMenu
-            app.HelpParentMenu = uimenu(app.UIFigure);
+            app.HelpParentMenu = uimenu(app.DarkAdaptationPlotterUIFigure);
             app.HelpParentMenu.Text = 'Help';
             
             % Create HelpMenu
@@ -346,7 +347,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             app.AboutMenu.Text = 'About...';
             
             % Create Table
-            app.Table = uitable(app.UIFigure);
+            app.Table = uitable(app.DarkAdaptationPlotterUIFigure);
             app.Table.ColumnName = {'ID'; '👁️'; 'Color'; 'Marker'; 'Size'};
             app.Table.ColumnWidth = {96, 32, 50, 60, 32};
             app.Table.RowName = {};
@@ -357,12 +358,12 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             app.Table.Position = [1 1 239.754098360656 600];
             
             % Create AxesPanel
-            app.AxesPanel = uipanel(app.UIFigure);
+            app.AxesPanel = uipanel(app.DarkAdaptationPlotterUIFigure);
             app.AxesPanel.AutoResizeChildren = 'off';
             app.AxesPanel.Position = [240 1 961 600];
             
             % Show the figure after all components are created
-            app.UIFigure.Visible = 'on';
+            app.DarkAdaptationPlotterUIFigure.Visible = 'on';
         end
     end
     
@@ -376,7 +377,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
             createComponents(app)
             
             % Register the app with App Designer
-            registerApp(app, app.UIFigure)
+            registerApp(app, app.DarkAdaptationPlotterUIFigure)
             
             % Execute the startup function
             runStartupFcn(app, @startupFcn)
@@ -390,7 +391,7 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         function delete(app)
             
             % Delete UIFigure when app is deleted
-            delete(app.UIFigure)
+            delete(app.DarkAdaptationPlotterUIFigure)
         end
     end
 end

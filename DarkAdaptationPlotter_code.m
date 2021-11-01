@@ -28,7 +28,6 @@ classdef DarkAdaptationPlotter < matlab.apps.AppBase
         dap_input_files = []
         dap_output_files = []
         dap_preferences = []
-        sort_state = 0
     end
     
     methods (Access = private)

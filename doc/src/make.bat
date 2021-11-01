@@ -27,9 +27,10 @@ if errorlevel 9009 (
 
 %SPHINXBUILD% -M %1 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
 if "%1" == "latex" (
-	pushd "./build/latex"
+	pushd "build/latex"
 	CALL make.bat
-	copy /v /y "*.pdf" "../../../user_guide.pdf"
+	SLEEP 5
+	copy /v /y "darkadaptationplotter.pdf" "../../../user_guide.pdf"
 	popd
 )
 

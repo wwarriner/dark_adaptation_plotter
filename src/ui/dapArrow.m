@@ -162,8 +162,10 @@ classdef dapArrow < handle
     
     methods (Access = private, Static)
         function r = compute_rotation_matrix(theta)
-            r = rotz(rad2deg(theta));
-            r = r(1:2, 1:2);
+            r = [...
+                cos(theta) -sin(theta); ...
+                sin(theta) cos(theta) ...
+                ];
         end
         
         function restore_units(axh, units)

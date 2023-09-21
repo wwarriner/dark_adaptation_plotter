@@ -1,141 +1,145 @@
 {
-  "axes": {
-    "font": {
-      "angle": {
-        "default": "normal",
-        "value": "normal"
-      },
-      "name": {
-        "default": "helvetica",
-        "value": "helvetica"
-      },
-      "size": {
-        "default": 16,
-        "value": 16
-      },
-      "weight": {
-        "default": "normal",
-        "value": "normal"
-      }
-    },
-    "legend": {
-      "location": {
-        "default": "North",
-        "value": "North"
-      }
-    },
-    "x": {
-      "label": {
-        "default": "Minutes following photobleach",
-        "value": "Minutes following photobleach"
-      },
-      "max": {
-        "default": 20,
-        "value": 20
-      },
-      "min": {
-        "default": 0,
-        "value": 0
-      },
-      "minor_step": {
-        "default": 1,
-        "value": 1
-      },
-      "step": {
-        "default": 5,
-        "value": 5
-      }
-    },
-    "y": {
-      "label": {
-        "default": "Log Sensitivity",
-        "value": "Log Sensitivity"
-      },
-      "max": {
-        "default": 5,
-        "value": 5
-      },
-      "min": {
-        "default": 0,
-        "value": 0
-      },
-      "minor_step": {
-        "default": 0.5,
-        "value": 0.5
-      },
-      "step": {
-        "default": 1,
-        "value": 1
-      }
-    }
-  },
-  "export": {
-    "desired_size_px": {
-      "default": 500,
-      "value": 500
-    },
-    "extension": {
-      "default": ".png",
-      "value": ".png"
-    },
-    "output_name": {
-      "default": "out",
-      "value": "out"
-    },
-    "valid_extensions": {
-      "value": [".png", ".pdf", ".eps"]
-    }
-  },
-  "files": {
-    "input_folder": {
-      "value": ""
-    },
-    "output_folder": {
-      "value": ""
-    }
-  },
-  "plot": {
-    "arrow": {
-      "head_size_pt": {
-        "default": 12,
-        "value": 12
-      },
-      "line_width_pt": {
-        "default": 2,
-        "value": 2
-      }
-    },
-    "scatter": {
-      "marker_edge_color": {
-        "default": "Black",
-        "value": "Black"
-      },
-      "marker_size": {
-        "default": 8,
-        "value": 8
-      }
-    }
-  },
-  "recovery_line": {
-    "style": {
-      "default": ":",
-      "value": ":"
-    },
-    "width": {
-      "default": 2,
-      "value": 2
-    },
-    "y": {
-      "default": 3,
-      "value": 3
-    }
-  },
-  "table_field_selection": {
-    "metanames": {
-      "id": "Patient ID",
-      "recovery_time": "Rod Intercept Time (min)",
-      "sensitivity": "Log Sensitivity (dB)",
-      "time": "Minutes Since Photobleach"
-    }
-  }
+"axes":{
+	"font":{
+		"angle":{
+			"default":"normal",
+			"value":"normal"
+			},
+		"name":{
+			"default":"helvetica",
+			"value":"helvetica"
+			},
+		"size":{
+			"default":16,
+			"value":16
+			},
+		"weight":{
+			"default":"normal",
+			"value":"normal"
+			}
+		},
+	"legend":{
+		"location":{
+			"default":"North",
+			"value":"North"
+			}
+		},
+	"x":{
+		"label":{
+			"default":"Minutes following photobleach",
+			"value":"Minutes following photobleach"
+			},
+		"max":{
+			"default":20,
+			"value":20
+			},
+		"min":{
+			"default":0,
+			"value":0
+			},
+		"minor_step":{
+			"default":1,
+			"value":1
+			},
+		"step":{
+			"default":5,
+			"value":5
+			}
+		},
+	"y":{
+		"label":{
+			"default":"Log Sensitivity",
+			"value":"Log Sensitivity"
+			},
+		"max":{
+			"default":5,
+			"value":5
+			},
+		"min":{
+			"default":0,
+			"value":0
+			},
+		"minor_step":{
+			"default":0.5,
+			"value":0.5
+			},
+		"step":{
+			"default":1,
+			"value":1
+			}
+		}
+	},
+"export":{
+	"desired_size_px":{
+		"default":500,
+		"value":500
+		},
+	"extension":{
+		"default":".png",
+		"value":".png"
+		},
+	"output_name":{
+		"default":"out",
+		"value":"out"
+		},
+	"valid_extensions":{
+		"value":[
+			".png",
+			".pdf",
+			".eps"
+			]
+		}
+	},
+"files":{
+	"input_folder":{
+		"value":"D:\\repos\\owsley_dark_adaptation_plotter\\"
+		},
+	"output_folder":{
+		"value":""
+		}
+	},
+"plot":{
+	"arrow":{
+		"head_size_pt":{
+			"default":12,
+			"value":12
+			},
+		"line_width_pt":{
+			"default":2,
+			"value":2
+			}
+		},
+	"scatter":{
+		"marker_edge_color":{
+			"default":"Black",
+			"value":"Black"
+			},
+		"marker_size":{
+			"default":8,
+			"value":8
+			}
+		}
+	},
+"recovery_line":{
+	"style":{
+		"default":":",
+		"value":":"
+		},
+	"width":{
+		"default":2,
+		"value":2
+		},
+	"y":{
+		"default":3,
+		"value":3
+		}
+	},
+"table_field_selection":{
+	"metanames":{
+		"id":"Patient ID",
+		"recovery_time":"Rod Intercept Time (min)",
+		"sensitivity":"Log Sensitivity (dB)",
+		"time":"Minutes Since Photobleach"
+		}
+	}
 }
